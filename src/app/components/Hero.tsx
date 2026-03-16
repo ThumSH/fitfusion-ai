@@ -62,7 +62,7 @@ export default function Hero() {
                 <Sparkles className="w-3 h-3 text-black" />
               </div>
               <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">
-                Powered by Gemini AI
+                Powered by Gemini
               </span>
             </motion.div>
 
