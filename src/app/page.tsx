@@ -1,10 +1,15 @@
-import Hero from "./components/Hero";
-import WorkoutGenerator from "./components/sections/WorkOut";
-export default function Home() {
+import HeroSection from "@/components/home/HeroSection";
+import FeatureCards from "@/components/home/FeatureCards";
+import WhyFitFusion from "@/components/home/WhyFitFusion";
+import CTASection from "@/components/home/CTASection";
+
+export default function HomePage() {
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center">
-      <Hero/>
-      <WorkoutGenerator/>
+    <main className="relative overflow-hidden">
+      <HeroSection />
+      <FeatureCards />
+      <WhyFitFusion />
+      <CTASection />
     </main>
   );
 }

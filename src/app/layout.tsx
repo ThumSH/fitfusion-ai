@@ -1,8 +1,8 @@
-// src/app/layout.tsx
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Navbar from "./components/layout/Navbar";
+import Navbar from "@/components/layout/Navbar";
+import Footer from "@/components/layout/Footer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -15,8 +15,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "FitFusion | AI-Powered Gym & Meal Prep",
-  description: "Experience the ultimate gym culture. Let AI analyze your meals and generate optimal workout plans.",
+  title: "FitFusion AI | Smarter Workouts. Better Meals.",
+  description:
+    "AI-powered workout planning, meal analysis, and beginner meal schedules for real people.",
 };
 
 export default function RootLayout({
@@ -25,15 +26,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark scroll-smooth">
+    <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} min-h-screen bg-[#050816] text-white antialiased`}
       >
         <Navbar />
-        {/* Added padding-top to account for the fixed navbar */}
-        <div className="pt-20"> 
-          {children}
-        </div>
+        <div className="pt-20">{children}</div>
+        <Footer />
       </body>
     </html>
   );
