@@ -17,7 +17,7 @@ const features = [
     title: "Meal Analyzer",
     description:
       "Upload meal images and get estimated calories, likely ingredients, and practical nutrition guidance.",
-    accent: "from-sky-400/20 to-transparent",
+    accent: "from-white/15 to-transparent",
     badge: "Image AI",
   },
   {
@@ -25,7 +25,7 @@ const features = [
     title: "Meal Planner",
     description:
       "Build an easy schedule for beginners who need a structured eating rhythm without overcomplication.",
-    accent: "from-violet-400/20 to-transparent",
+    accent: "from-[#b9ff66]/15 to-transparent",
     badge: "Beginner-first",
   },
 ];
@@ -35,7 +35,7 @@ export default function FeatureCards() {
     <section id="features" className="relative py-24">
       <div className="container-shell">
         <div className="mx-auto max-w-3xl text-center">
-          <p className="mb-3 text-sm font-medium uppercase tracking-[0.25em] text-[#b9ff66]">
+          <p className="mb-3 text-sm font-medium uppercase tracking-[0.25em] text-primary">
             Core Features
           </p>
           <h2 className="section-title">Three tools. One fitness flow.</h2>
@@ -57,10 +57,10 @@ export default function FeatureCards() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.25 }}
                 transition={{ duration: 0.5, delay: index * 0.08 }}
-                className="group relative overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.04] p-6 shadow-xl shadow-black/20"
+                className="group relative overflow-hidden rounded-4xl border border-white/10 bg-white/4 p-6 shadow-xl shadow-black/20"
               >
                 <div
-                  className={`absolute inset-0 bg-gradient-to-br ${feature.accent} opacity-80`}
+                  className={`absolute inset-0 bg-linear-to-br ${feature.accent} opacity-80`}
                 />
                 <div className="relative z-10">
                   <div className="flex items-start justify-between">
@@ -82,7 +82,7 @@ export default function FeatureCards() {
 
                   <a
                     href="#"
-                    className="mt-8 inline-flex items-center gap-2 text-sm font-medium text-[#d8ffaf] transition group-hover:translate-x-1"
+                    className="mt-8 inline-flex items-center gap-2 text-sm font-medium text-[#e7ffc7] transition group-hover:translate-x-1"
                   >
                     Coming next in Sprint B/C/D
                     <ArrowUpRight size={16} />

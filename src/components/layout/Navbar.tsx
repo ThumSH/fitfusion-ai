@@ -1,105 +1,66 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react"
 import Link from "next/link";
-import { motion, AnimatePresence, useScroll, useMotionValueEvent } from "framer-motion";
-import { Dumbbell, ArrowUpRight } from "lucide-react";
-
-const navItems = [
-  { label: "Workout Planner", href: "/workout-planner" },
-   { label: "Gym Finder", href: "/gym-finder" },
-  { label: "Meal Planner", href: "/meal-planner" },
-  { label: "Why FitFusion", href: "#" },
-   { label: "Who are we", href: "/Why" },
-  { label: "Contact", href: "#contact", isSpecial: true },
-];
+import { Menu, X, Dumbbell } from "lucide-react";
+import { motion } from "framer-motion";
 
 export default function Navbar() {
-  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
-  const [isHidden, setIsHidden] = useState(false);
-  const { scrollY } = useScroll();
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  useMotionValueEvent(scrollY, "change", (latest) => {
-    const previous = scrollY.getPrevious() ?? 0;
-    if (latest > previous && latest > 150) {
-      setIsHidden(true);
-    } else {
-      setIsHidden(false);
-    }
-  });
+  // Trigger the glassmorphism effect when the user scrolls down
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const navLinks = [
+    { name: "Home", href: "/" },
+    { name: "Workout Planner", href: "/workout-planner" },
+    { name: "Meal Planner", href: "/meal-planner#planner" },
+    { name: "Gym Finder", href: "/gym-finder" },
+  ];
 
   return (
-    <motion.nav
-      variants={{
-        visible: { y: 0, opacity: 1 },
-        hidden: { y: "-150%", opacity: 0 },
-      }}
-      animate={isHidden ? "hidden" : "visible"}
-      transition={{ duration: 0.4, ease: [0.23, 1, 0.32, 1] }}
-      className="fixed top-8 left-0 right-0 z-50 flex justify-center px-6"
+    <nav
+      className={`fixed top-0 left-0 w-full z-[90] transition-all duration-300 ${
+        isScrolled
+          ? "bg-black/85 backdrop-blur-md border-b border-white/10 py-3 shadow-lg shadow-black/50"
+          : "bg-transparent py-5"
+      }`}
     >
-      <div className="w-full max-w-7xl flex items-center justify-between">
+      <div className="max-w-[1220px] mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-[auto_1fr_auto] items-center gap-6">
         
-        {/* Logo Section */}
-        <motion.div whileHover={{ scale: 1.05 }} className="flex-1">
-          <Link href="/" className="flex items-center gap-3 w-fit group">
-            <motion.div 
-              whileHover={{ rotate: 180 }}
-              transition={{ duration: 0.5 }}
-              className="bg-[#b9ff66] p-2 rounded-xl text-black shadow-[0_0_15px_rgba(185,255,102,0.3)]"
-            >
-              <Dumbbell size={22} strokeWidth={2.5} />
-            </motion.div>
-            <span className="text-white font-black text-2xl tracking-tight hidden sm:block">
-              FIT<span className="text-[#b9ff66]">FUSION</span>
+        {/* LEFT: Brand Logo */}
+        <div className="shrink-0">
+          <Link href="/" className="flex items-center gap-2 group">
+            <Dumbbell className="text-[#b9ff66] group-hover:-rotate-45 transition-transform duration-300" size={28} />
+            <span className="text-xl lg:text-2xl font-bold uppercase tracking-wider text-white whitespace-nowrap">
+              Fit<span className="text-[#b9ff66]">Fusion</span>
             </span>
           </Link>
-        </motion.div>
+        </div>
 
-        {/* Centered Menu */}
-        <nav className="relative flex items-center gap-1 bg-black/40 backdrop-blur-xl border border-white/10 rounded-full p-1.5 shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
-          <AnimatePresence>
-            {navItems.map((item, index) => (
-              <Link
-                key={item.label}
-                href={item.href}
-                onMouseEnter={() => setHoveredIndex(index)}
-                onMouseLeave={() => setHoveredIndex(null)}
-                className={`relative px-5 py-2.5 text-sm font-semibold transition-colors duration-300 rounded-full flex items-center gap-1
-                  ${hoveredIndex === index ? "text-black" : "text-gray-300"}
-                  ${item.isSpecial && hoveredIndex !== index ? "bg-white/5" : ""}
-                `}
-              >
-                <span className="relative z-10 flex items-center gap-1">
-                  {item.label}
-                  {item.isSpecial && <ArrowUpRight size={14} opacity={0.6} />}
-                </span>
-                
-                {hoveredIndex === index && (
-                  <motion.div
-                    layoutId="nav-pill"
-                    className="absolute inset-0 bg-[#b9ff66] rounded-full"
-                    style={{ 
-                      boxShadow: "0 0 25px rgba(185, 255, 102, 0.6)",
-                    }}
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.9 }}
-                    transition={{
-                      type: "spring",
-                      stiffness: 400,
-                      damping: 28,
-                    }}
-                  />
-                )}
-              </Link>
-            ))}
-          </AnimatePresence>
-        </nav>
+        {/* CENTER: Desktop Navigation */}
+        <div className="hidden md:flex justify-center items-center gap-4 lg:gap-6 xl:gap-8 min-w-0">
+          {navLinks.map((link) => (
+            <Link
+              key={link.name}
+              href={link.href}
+              className="text-[15px] font-semibold text-white/70 hover:text-[#b9ff66] transition-colors whitespace-nowrap"
+            >
+              {link.name}
+            </Link>
+          ))}
+        </div>
 
-        {/* Join Now Button with Neon Animation */}
-        <div className="flex-1 flex justify-end hidden md:flex">
-          <motion.button 
+        {/* RIGHT: Get Started Button */}
+        <div className="hidden md:flex items-center justify-end">
+          <motion.div
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className="relative p-[1.5px] overflow-hidden rounded-full group transition-all duration-300"
@@ -108,12 +69,48 @@ export default function Navbar() {
             <div className="absolute inset-[-1000%] animate-[spin_4s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#b9ff66_0%,transparent_20%,#b9ff66_50%,transparent_70%,#b9ff66_100%)] opacity-100" />
             
             {/* Inner Button Content */}
-            <span className="relative z-10 flex items-center justify-center bg-[#0a0a0a] text-white text-xs font-bold py-2.5 px-6 rounded-full group-hover:bg-[#b9ff66] group-hover:text-black transition-all duration-300">
-              JOIN NOW
-            </span>
-          </motion.button>
+            <Link
+              href="/Why"
+              className="relative z-10 flex items-center justify-center bg-[#0a0a0a] text-white text-xs font-bold py-2.5 px-6 rounded-full group-hover:bg-[#b9ff66] group-hover:text-black transition-all duration-300"
+            >
+             About Us
+            </Link>
+          </motion.div>
+        </div>
+
+        {/* Mobile Menu Hamburger Toggle */}
+        <div className="md:hidden flex ml-auto">
+          <button
+            className="text-white hover:text-[#b9ff66] transition-colors"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          >
+            {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
+          </button>
         </div>
       </div>
-    </motion.nav>
+
+      {/* Mobile Navigation Dropdown */}
+      <div
+        className={`md:hidden absolute top-full left-0 w-full bg-black/95 backdrop-blur-md border-b border-white/10 transition-all duration-300 overflow-hidden ${
+          isMobileMenuOpen ? "max-h-96 py-6" : "max-h-0 py-0 border-transparent opacity-0"
+        }`}
+      >
+        <div className="flex flex-col items-center gap-6">
+          {navLinks.map((link) => (
+            <Link
+              key={link.name}
+              href={link.href}
+              onClick={() => setIsMobileMenuOpen(false)} // Close menu on click
+              className="text-lg font-medium text-white/70 hover:text-[#b9ff66] transition-colors"
+            >
+              {link.name}
+            </Link>
+          ))}
+          <Link href="/meal-planner#planner" className="bg-[#b9ff66] text-black px-8 py-3 rounded-full font-bold text-sm w-10/12 mt-2 text-center">
+            Get Started
+          </Link>
+        </div>
+      </div>
+    </nav>
   );
 }

@@ -28,13 +28,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        // 1. ADDED: flex and flex-col to stack items vertically
-        className={`${geistSans.variable} ${geistMono.variable} min-h-screen bg-[#050816] text-white antialiased flex flex-col`}
+        className={`${geistSans.variable} ${geistMono.variable} min-h-screen bg-[var(--color-background)] text-[var(--color-foreground)] antialiased flex flex-col`}
       >
         <Navbar />
-        
-        {/* 2. ADDED: flex-1 to push the footer to the bottom of the screen */}
-        {/* Changed from div to main for better semantic HTML */}
         <main className="flex-1 pt-20">
           {children}
         </main>

@@ -2,46 +2,43 @@ import { Facebook, Linkedin, Instagram, Globe } from "lucide-react";
 
 export default function Footer() {
   return (
-    // Background color applied to match the high-end aesthetic
-    <footer className="bg-[#D4FF48] py-16 px-6 text-black">
+    <footer className="relative z-50 border-t border-[#b9ff66]/20 bg-black py-16 px-6 text-white">
       <div className="container-shell max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12">
-        
-        {/* Branding/Logo section */}
         <div>
-          <h1 className="text-4xl font-bold mb-4">FIT FUSHION</h1>
-          <p className="text-sm font-medium">FitFusion helps beginners stay fit with AI workouts and smart meal planning.</p>
+          <h1 className="text-4xl font-bold mb-4 uppercase tracking-wider">
+            Fit<span className="text-[#b9ff66]">Fusion</span>
+          </h1>
+          <p className="text-sm font-medium text-white/70">
+            FitFusion helps beginners stay fit with AI workouts and smart meal planning.
+          </p>
         </div>
 
-        {/* Website Map links */}
         <div>
-          <h3 className="font-semibold text-lg mb-6">ABOUT US</h3>
-          <ul className="space-y-4 text-sm font-medium">
-            <li className="cursor-pointer hover:underline">Workout Planner</li>
-            <li className="cursor-pointer hover:underline">Meal Analyzer</li>
-            <li className="cursor-pointer hover:underline">Meal Planner</li>
+          <h3 className="font-semibold text-lg mb-6 uppercase tracking-wide text-[#b9ff66]">About Us</h3>
+          <ul className="space-y-4 text-sm font-medium text-white/70">
+            <li className="cursor-pointer hover:text-white transition-all">Workout Planner</li>
+            <li className="cursor-pointer hover:text-white transition-all">Meal Analyzer</li>
+            <li className="cursor-pointer hover:text-white transition-all">Meal Planner</li>
           </ul>
         </div>
 
-        {/* Contacts section */}
         <div>
-          <h3 className="font-semibold text-lg mb-6">Contacts</h3>
-          <div className="space-y-4 text-sm font-medium">
-            
-            <p>WWW.FIT-FUSHION.COM</p>
+          <h3 className="font-semibold text-lg mb-6 uppercase tracking-wide text-[#b9ff66]">Contacts</h3>
+          <div className="space-y-4 text-sm font-medium text-white/70">
+            <p className="cursor-pointer hover:text-white transition-all">www.fitfusion.ai</p>
             <p>011 2123 456</p>
             <p>Colombo, Sri Lanka</p>
           </div>
         </div>
       </div>
 
-      {/* Bottom section with Copyright and Social Icons */}
-      <div className="container-shell max-w-7xl mx-auto mt-16 pt-8 border-t border-black/20 flex flex-col md:flex-row justify-between items-center gap-6">
-        <p className="text-sm font-medium">© 2026 FIT FUSHION. All rights reserved</p>
+      <div className="container-shell max-w-7xl mx-auto mt-16 pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-6">
+        <p className="text-sm font-medium text-white/60">© {new Date().getFullYear()} FitFusion AI. All rights reserved.</p>
         <div className="flex gap-4">
-          <Facebook size={20} className="cursor-pointer" />
-          <Linkedin size={20} className="cursor-pointer" />
-          <Instagram size={20} className="cursor-pointer" />
-          <Globe size={20} className="cursor-pointer" />
+          <Facebook size={20} className="cursor-pointer text-white/70 hover:text-[#b9ff66] hover:scale-110 transition-all" />
+          <Linkedin size={20} className="cursor-pointer text-white/70 hover:text-[#b9ff66] hover:scale-110 transition-all" />
+          <Instagram size={20} className="cursor-pointer text-white/70 hover:text-[#b9ff66] hover:scale-110 transition-all" />
+          <Globe size={20} className="cursor-pointer text-white/70 hover:text-[#b9ff66] hover:scale-110 transition-all" />
         </div>
       </div>
     </footer>

@@ -1,63 +1,50 @@
-"use client";
-
-import { ShieldCheck, Sparkles, Zap, LayoutDashboard } from "lucide-react";
-import SectionWrapper from "./SectionWrapper";
-
-const items = [
-  {
-    icon: Sparkles,
-    title: "AI-first fitness support",
-    text: "A modern experience designed around smart, personalized guidance.",
-  },
-  {
-    icon: ShieldCheck,
-    title: "Safer user direction",
-    text: "Designed to steer users toward realistic plans instead of random intensity.",
-  },
-  {
-    icon: Zap,
-    title: "Fast and accessible",
-    text: "Beginner-friendly interactions that reduce friction and keep momentum high.",
-  },
-  {
-    icon: LayoutDashboard,
-    title: "Beautiful product feel",
-    text: "A polished interface that makes the app feel credible and investor-ready.",
-  },
-];
+import { Zap, Target, ShieldCheck, Activity } from "lucide-react";
+import SectionHeader from "../layout/SectionHeader";
 
 export default function WhyChooseUs() {
-  return (
-    <SectionWrapper>
-      <div className="grid gap-10 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
-        <div>
-          <p className="mb-3 text-sm uppercase tracking-[0.25em] text-[#b9ff66]">
-            Why choose FitFusion
-          </p>
-          <h2 className="section-title">
-            Built for people who want structure, not confusion
-          </h2>
-          <p className="mt-6 text-base leading-8 text-white/70">
-            The goal is simple: make fitness planning feel smart, clean,
-            supportive, and actually usable for beginners.
-          </p>
-        </div>
+  const features = [
+    {
+      icon: <Zap className="text-[#b9ff66] w-8 h-8 mb-4 group-hover:scale-110 transition-transform" />,
+      title: "Lightning Fast AI",
+      description: "Generate complete, scientifically-backed workout and meal plans in seconds, not hours."
+    },
+    {
+      icon: <Target className="text-[#b9ff66] w-8 h-8 mb-4 group-hover:scale-110 transition-transform" />,
+      title: "Hyper-Personalized",
+      description: "No cookie-cutter routines. Every schedule adapts to your specific experience level and goals."
+    },
+    {
+      icon: <Activity className="text-[#b9ff66] w-8 h-8 mb-4 group-hover:scale-110 transition-transform" />,
+      title: "Beginner Friendly",
+      description: "We eliminate gym anxiety by providing clear, actionable steps and meal prep guides for real people."
+    },
+    {
+      icon: <ShieldCheck className="text-[#b9ff66] w-8 h-8 mb-4 group-hover:scale-110 transition-transform" />,
+      title: "Data Driven Results",
+      description: "Our algorithms analyze your macros and performance to ensure you are always progressing."
+    }
+  ];
 
-        <div className="grid gap-5 sm:grid-cols-2">
-          {items.map((item) => {
-            const Icon = item.icon;
-            return (
-              <div key={item.title} className="glass-card rounded-[1.75rem] p-6">
-                <div className="mb-4 inline-flex rounded-2xl bg-white/5 p-3 text-[#b9ff66]">
-                  <Icon size={20} />
-                </div>
-                <h3 className="text-lg font-semibold text-white">{item.title}</h3>
-                <p className="mt-3 text-sm leading-7 text-white/65">{item.text}</p>
-              </div>
-            );
-          })}
-        </div>
+  return (
+    <section className="w-full py-12">
+      <SectionHeader 
+        title="Why Choose" 
+        highlightWord="FitFusion"
+        description="We combine cutting-edge artificial intelligence with proven fitness principles to give you the ultimate unfair advantage."
+      />
+
+      <div className="max-w-6xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-12">
+        {features.map((feature, index) => (
+          <div 
+            key={index} 
+            className="group bg-white/5 border border-white/10 p-8 rounded-2xl backdrop-blur-sm hover:bg-white/10 hover:border-[#b9ff66]/50 transition-all cursor-default"
+          >
+            {feature.icon}
+            <h3 className="text-xl font-bold text-white mb-3 tracking-wide">{feature.title}</h3>
+            <p className="text-white/60 text-sm leading-relaxed">{feature.description}</p>
+          </div>
+        ))}
       </div>
-    </SectionWrapper>
+    </section>
   );
 }

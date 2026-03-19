@@ -69,11 +69,11 @@ function HotspotBox({
           }`}
         >
           {/* High-tech Crosshair Structure */}
-          <div className={`absolute h-[2px] w-full transition-colors duration-300 ${isActive ? "bg-[#b9ff66] shadow-[0_0_12px_#b9ff66]" : "bg-white"}`} />
-          <div className={`absolute h-full w-[2px] transition-colors duration-300 ${isActive ? "bg-[#b9ff66] shadow-[0_0_12px_#b9ff66]" : "bg-white"}`} />
+          <div className={`absolute h-0.5 w-full transition-colors duration-300 ${isActive ? "bg-primary shadow-[0_0_12px_#b9ff66]" : "bg-white"}`} />
+          <div className={`absolute h-full w-0.5 transition-colors duration-300 ${isActive ? "bg-primary shadow-[0_0_12px_#b9ff66]" : "bg-white"}`} />
           
           {/* Diamond center */}
-          <div className={`absolute h-2 w-2 rotate-45 transition-colors duration-300 ${isActive ? "bg-[#b9ff66]" : "bg-transparent"}`} />
+          <div className={`absolute h-2 w-2 rotate-45 transition-colors duration-300 ${isActive ? "bg-primary" : "bg-transparent"}`} />
         </div>
       </Html>
     </group>

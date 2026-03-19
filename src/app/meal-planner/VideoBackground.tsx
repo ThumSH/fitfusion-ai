@@ -1,25 +1,23 @@
 export default function VideoBackground() {
   return (
-    // Absolute position keeps the effect within the page section and avoids covering the global footer
-    <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden bg-[#0b1020]">
-      
-      {/* This is a dark overlay. Even with low opacity, videos can have bright spots 
-        that make your white text hard to read. This overlay ensures perfect contrast. 
-      */}
-      <div className="absolute inset-0 z-10 bg-[#0b1020]/70" />
-
-      {/* The Video Element */}
+    <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden bg-background">
       <video
         autoPlay
         loop
         muted
         playsInline
-        className="absolute inset-0 h-full w-full object-cover opacity-40 mix-blend-luminosity"
+        preload="auto"
+        className="absolute inset-0 z-0 h-full w-full object-cover object-center opacity-75"
       >
-        {/* The path starts with '/' which tells Next.js to look in the public folder */}
         <source src="/food-bg.mp4" type="video/mp4" />
         Your browser does not support the video tag.
       </video>
+
+      {/* 2. Top-to-bottom gradient: lighter at the top for the header, fading into the dark page background at the bottom */}
+      <div className="absolute inset-0 z-10 bg-linear-to-b from-black/30 via-black/50 to-background" />
+      
+      {/* 3. Radial vignette: darkens the corners to focus the user's eye on the center content */}
+      <div className="absolute inset-0 z-10 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(5,5,5,0.6)_100%)]" />
     </div>
   );
 }

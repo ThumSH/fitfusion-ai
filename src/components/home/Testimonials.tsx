@@ -1,52 +1,59 @@
-"use client";
-
-import SectionWrapper from "./SectionWrapper";
-
-const testimonials = [
-  {
-    name: "Ayesha",
-    role: "Beginner User",
-    quote:
-      "The whole experience feels easy to understand. I don’t feel overwhelmed when planning meals and workouts.",
-  },
-  {
-    name: "Ravindu",
-    role: "Busy Student",
-    quote:
-      "I like that it feels modern and simple. It gives structure without making fitness feel complicated.",
-  },
-  {
-    name: "Nethmi",
-    role: "Health-focused User",
-    quote:
-      "The meal analysis idea is super useful. It makes the product feel smarter than a normal gym website.",
-  },
-];
+import { Star } from "lucide-react";
+import SectionHeader from "../layout/SectionHeader";
 
 export default function Testimonials() {
-  return (
-    <SectionWrapper>
-      <div className="mx-auto max-w-3xl text-center">
-        <p className="mb-3 text-sm uppercase tracking-[0.25em] text-[#b9ff66]">
-          User vibe
-        </p>
-        <h2 className="section-title">A platform users can actually connect with</h2>
-      </div>
+  const reviews = [
+    {
+      name: "Marcus T.",
+      role: "Beginner Lifter",
+      content: "I had no idea what to do in the gym. FitFusion gave me a 3-day split that actually made sense, and the meal analyzer keeps my protein in check.",
+      rating: 5
+    },
+    {
+      name: "Sarah L.",
+      role: "Home Workout Athlete",
+      content: "I only have dumbbells at home. The AI generated a completely custom routine for my equipment. It's like having a personal trainer in my pocket.",
+      rating: 5
+    },
+    {
+      name: "David K.",
+      role: "Busy Professional",
+      content: "The meal prep schedule is a lifesaver. I plug in my target macros and it tells me exactly how to batch-cook for the week. Highly recommend.",
+      rating: 5
+    }
+  ];
 
-      <div className="mt-14 grid gap-6 lg:grid-cols-3">
-        {testimonials.map((item) => (
-          <div
-            key={item.name}
-            className="glass-card rounded-[2rem] p-6 transition duration-300 hover:-translate-y-1 hover:border-white/20"
-          >
-            <p className="text-sm leading-7 text-white/70">“{item.quote}”</p>
-            <div className="mt-6">
-              <h3 className="text-base font-semibold text-white">{item.name}</h3>
-              <p className="text-sm text-white/45">{item.role}</p>
+  return (
+    <section className="w-full py-12">
+      <SectionHeader 
+        title="Real People." 
+        highlightWord="Real Results."
+        description="Don't just take our word for it. See how FitFusion is helping beginners and veterans alike crush their fitness goals."
+      />
+
+      <div className="max-w-6xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
+        {reviews.map((review, index) => (
+          <div key={index} className="bg-white/5 border border-white/10 p-8 rounded-2xl backdrop-blur-sm relative group hover:border-[#b9ff66]/50 transition-colors">
+            {/* Glowing quote mark for aesthetic */}
+            <div className="absolute top-4 right-6 text-6xl text-[#b9ff66] opacity-20 font-serif leading-none group-hover:opacity-40 transition-opacity"></div>
+            
+            <div className="flex gap-1 mb-6">
+              {[...Array(review.rating)].map((_, i) => (
+                <Star key={i} size={18} className="fill-[#b9ff66] text-[#b9ff66]" />
+              ))}
+            </div>
+            
+            <p className="text-white/70 italic mb-8 relative z-10 leading-relaxed">
+              {review.content}
+            </p>
+            
+            <div>
+              <h4 className="text-white font-bold uppercase tracking-wide">{review.name}</h4>
+              <p className="text-[#b9ff66] text-sm">{review.role}</p>
             </div>
           </div>
         ))}
       </div>
-    </SectionWrapper>
+    </section>
   );
 }

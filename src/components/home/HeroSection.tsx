@@ -19,7 +19,7 @@ export default function HeroSection() {
         </video>
         
         {/* The Blend Gradient */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black via-black/60 to-transparent lg:block hidden" />
+        <div className="absolute inset-0 bg-linear-to-r from-black via-black/60 to-transparent lg:block hidden" />
         
         {/* Mobile overlay */}
         <div className="absolute inset-0 bg-black/50 lg:hidden block" />
@@ -35,7 +35,7 @@ export default function HeroSection() {
             transition={{ duration: 0.8 }}
             className="lg:col-span-5 flex flex-col items-start"
           >
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[#b9ff66]/20 bg-[#b9ff66]/10 px-4 py-2 text-xs text-[#d7ffab]">
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-4 py-2 text-xs text-[#d7ffab]">
               <Sparkles size={14} />
               AI-powered fitness tools
             </div>
@@ -56,7 +56,7 @@ export default function HeroSection() {
             <div className="mt-8 flex flex-col gap-4 sm:flex-row w-full lg:w-auto">
               <a
                 href="#features"
-                className="inline-flex items-center justify-center gap-2 rounded-full bg-[#b9ff66] px-6 py-3 text-sm font-semibold text-black transition hover:brightness-110"
+                className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-black transition hover:brightness-110"
               >
                 Get Started
                 <ArrowRight size={16} />
@@ -65,11 +65,11 @@ export default function HeroSection() {
 
             <div className="mt-10 space-y-3 text-xs text-white/40">
               <div className="flex items-center gap-2">
-                <div className="h-1 w-1 rounded-full bg-[#b9ff66]" />
+                <div className="h-1 w-1 rounded-full bg-primary" />
                 Tailored Workout Plans
               </div>
               <div className="flex items-center gap-2">
-                <div className="h-1 w-1 rounded-full bg-[#b9ff66]" />
+                <div className="h-1 w-1 rounded-full bg-primary" />
                 AI Meal Estimates
               </div>
             </div>

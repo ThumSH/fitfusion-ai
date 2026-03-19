@@ -12,10 +12,10 @@ export default function CTASection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.25 }}
           transition={{ duration: 0.5 }}
-          className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-gradient-to-br from-[#b9ff66]/10 via-white/[0.04] to-sky-400/10 p-8 sm:p-10 lg:p-14"
+          className="relative overflow-hidden rounded-4xl border border-white/10 bg-linear-to-br from-primary/12 via-white/4 to-white/[0.07] p-8 sm:p-10 lg:p-14"
         >
-          <div className="absolute right-0 top-0 h-56 w-56 rounded-full bg-[#b9ff66]/15 blur-3xl" />
-          <div className="absolute bottom-0 left-0 h-56 w-56 rounded-full bg-sky-400/10 blur-3xl" />
+          <div className="absolute right-0 top-0 h-56 w-56 rounded-full bg-primary/15 blur-3xl" />
+          <div className="absolute bottom-0 left-0 h-56 w-56 rounded-full bg-white/10 blur-3xl" />
 
           <div className="relative z-10 max-w-3xl">
             <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-white/75">
@@ -36,7 +36,7 @@ export default function CTASection() {
             <div className="mt-8">
               <a
                 href="#features"
-                className="inline-flex items-center gap-2 rounded-full bg-[#b9ff66] px-6 py-3.5 text-sm font-semibold text-black transition hover:scale-[1.02]"
+                className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3.5 text-sm font-semibold text-black transition hover:scale-[1.02]"
               >
                 Continue to Sprint B
                 <ArrowRight size={16} />

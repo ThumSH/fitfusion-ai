@@ -17,9 +17,9 @@ export default function HumanModel() {
         child.receiveShadow = true;
 
         child.material = new THREE.MeshStandardMaterial({
-          color: "#334155", // Lighter slate gray to reflect more light
-          roughness: 0.45,  // Increased slightly so the highlights aren't too sharp
-          metalness: 0.5,   // Lowered so it doesn't look completely black in shadows
+          color: "#2c2c2c",
+          roughness: 0.45,
+          metalness: 0.5,
           envMapIntensity: 1.2,
         });
       }

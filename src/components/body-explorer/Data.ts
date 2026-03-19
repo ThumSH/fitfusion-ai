@@ -74,7 +74,7 @@ export const muscleData: Record<MuscleGroupId, MuscleGroupData> = {
     id: "shoulders",
     label: "Shoulders",
     description: "The deltoid is a large, triangular muscle covering the shoulder joint, crucial for arm elevation and rotation.",
-    imageUrl: "/chest.png",
+    imageUrl: "/shoulder.png",
     subMuscles: [
       {
         name: "Anterior Deltoid (Front)",
@@ -106,7 +106,7 @@ export const muscleData: Record<MuscleGroupId, MuscleGroupData> = {
     id: "abs",
     label: "Abs",
     description: "The core stabilizes the torso and supports balance, posture, and overall movement quality.",
-    imageUrl: "/chest.png",
+    imageUrl: "/abs.png",
     subMuscles: [
       {
         name: "Rectus Abdominis (Upper)",
@@ -143,7 +143,7 @@ export const muscleData: Record<MuscleGroupId, MuscleGroupData> = {
     id: "legs",
     label: "Legs",
     description: "The legs generate power, mobility, balance, and foundational strength for the body.",
-    imageUrl: "/chest.png",
+    imageUrl: "/legs.jpg",
     subMuscles: [
       {
         name: "Gluteus Maximus",
@@ -180,7 +180,7 @@ export const muscleData: Record<MuscleGroupId, MuscleGroupData> = {
     id: "back",
     label: "Back",
     description: "The back supports posture, pulling strength, and upper-body stability.",
-    imageUrl: "/chest.png",
+    imageUrl: "/back.png",
     subMuscles: [
       {
         name: "Trapezius",
