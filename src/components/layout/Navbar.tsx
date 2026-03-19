@@ -1,112 +1,119 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
-import { Dumbbell, Menu, Sparkles, X } from "lucide-react";
-import { useEffect, useState } from "react";
-import { cn } from "@/lib/utils/cn";
+import { motion, AnimatePresence, useScroll, useMotionValueEvent } from "framer-motion";
+import { Dumbbell, ArrowUpRight } from "lucide-react";
 
 const navItems = [
-  { label: "Workout Planner", href: "#features" },
-  { label: "Meal Analyzer", href: "#features" },
-  { label: "Meal Planner", href: "#features" },
-  { label: "Why FitFusion", href: "#why-fitfusion" },
+  { label: "Workout Planner", href: "/workout-planner" },
+   { label: "Gym Finder", href: "/gym-finder" },
+  { label: "Meal Planner", href: "/meal-planner" },
+  { label: "Why FitFusion", href: "#" },
+   { label: "Who are we", href: "/Why" },
+  { label: "Contact", href: "#contact", isSpecial: true },
 ];
 
 export default function Navbar() {
-  const [isOpen, setIsOpen] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const [isHidden, setIsHidden] = useState(false);
+  const { scrollY } = useScroll();
 
-  useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 20);
-    handleScroll();
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  useMotionValueEvent(scrollY, "change", (latest) => {
+    const previous = scrollY.getPrevious() ?? 0;
+    if (latest > previous && latest > 150) {
+      setIsHidden(true);
+    } else {
+      setIsHidden(false);
+    }
+  });
 
   return (
-    <motion.header
-      initial={{ y: -20, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      className="fixed inset-x-0 top-0 z-50"
+    <motion.nav
+      variants={{
+        visible: { y: 0, opacity: 1 },
+        hidden: { y: "-150%", opacity: 0 },
+      }}
+      animate={isHidden ? "hidden" : "visible"}
+      transition={{ duration: 0.4, ease: [0.23, 1, 0.32, 1] }}
+      className="fixed top-8 left-0 right-0 z-50 flex justify-center px-6"
     >
-      <div className="container-shell pt-4">
-        <div
-          className={cn(
-            "flex items-center justify-between rounded-2xl px-4 py-3 transition-all duration-300 sm:px-6",
-            isScrolled
-              ? "glass-card border-white/15 shadow-2xl shadow-black/30"
-              : "bg-white/[0.03] border border-white/10"
-          )}
-        >
-          <Link href="/" className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#b9ff66] text-black shadow-lg shadow-[#b9ff66]/20">
-              <Dumbbell size={18} />
-            </div>
-            <div>
-              <p className="text-sm font-medium tracking-[0.28em] text-white/60">
-                FITFUSION
-              </p>
-              <p className="text-base font-semibold text-white">AI Fitness</p>
-            </div>
+      <div className="w-full max-w-7xl flex items-center justify-between">
+        
+        {/* Logo Section */}
+        <motion.div whileHover={{ scale: 1.05 }} className="flex-1">
+          <Link href="/" className="flex items-center gap-3 w-fit group">
+            <motion.div 
+              whileHover={{ rotate: 180 }}
+              transition={{ duration: 0.5 }}
+              className="bg-[#b9ff66] p-2 rounded-xl text-black shadow-[0_0_15px_rgba(185,255,102,0.3)]"
+            >
+              <Dumbbell size={22} strokeWidth={2.5} />
+            </motion.div>
+            <span className="text-white font-black text-2xl tracking-tight hidden sm:block">
+              FIT<span className="text-[#b9ff66]">FUSION</span>
+            </span>
           </Link>
+        </motion.div>
 
-          <nav className="hidden items-center gap-8 md:flex">
-            {navItems.map((item) => (
-              <a
+        {/* Centered Menu */}
+        <nav className="relative flex items-center gap-1 bg-black/40 backdrop-blur-xl border border-white/10 rounded-full p-1.5 shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+          <AnimatePresence>
+            {navItems.map((item, index) => (
+              <Link
                 key={item.label}
                 href={item.href}
-                className="text-sm text-white/70 transition hover:text-white"
+                onMouseEnter={() => setHoveredIndex(index)}
+                onMouseLeave={() => setHoveredIndex(null)}
+                className={`relative px-5 py-2.5 text-sm font-semibold transition-colors duration-300 rounded-full flex items-center gap-1
+                  ${hoveredIndex === index ? "text-black" : "text-gray-300"}
+                  ${item.isSpecial && hoveredIndex !== index ? "bg-white/5" : ""}
+                `}
               >
-                {item.label}
-              </a>
-            ))}
-          </nav>
-
-          <div className="hidden md:block">
-            <a
-              href="#features"
-              className="inline-flex items-center gap-2 rounded-full bg-[#b9ff66] px-5 py-2.5 text-sm font-semibold text-black transition hover:scale-[1.02]"
-            >
-              <Sparkles size={16} />
-              Try FitFusion
-            </a>
-          </div>
-
-          <button
-            className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-white md:hidden"
-            onClick={() => setIsOpen((prev) => !prev)}
-            aria-label="Toggle menu"
-          >
-            {isOpen ? <X size={18} /> : <Menu size={18} />}
-          </button>
-        </div>
-
-        {isOpen && (
-          <div className="mt-3 rounded-2xl border border-white/10 bg-[#0b1020]/95 p-4 shadow-2xl md:hidden">
-            <div className="flex flex-col gap-4">
-              {navItems.map((item) => (
-                <a
-                  key={item.label}
-                  href={item.href}
-                  onClick={() => setIsOpen(false)}
-                  className="text-sm text-white/75 transition hover:text-white"
-                >
+                <span className="relative z-10 flex items-center gap-1">
                   {item.label}
-                </a>
-              ))}
+                  {item.isSpecial && <ArrowUpRight size={14} opacity={0.6} />}
+                </span>
+                
+                {hoveredIndex === index && (
+                  <motion.div
+                    layoutId="nav-pill"
+                    className="absolute inset-0 bg-[#b9ff66] rounded-full"
+                    style={{ 
+                      boxShadow: "0 0 25px rgba(185, 255, 102, 0.6)",
+                    }}
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.9 }}
+                    transition={{
+                      type: "spring",
+                      stiffness: 400,
+                      damping: 28,
+                    }}
+                  />
+                )}
+              </Link>
+            ))}
+          </AnimatePresence>
+        </nav>
 
-              <a
-                href="#features"
-                onClick={() => setIsOpen(false)}
-                className="inline-flex items-center justify-center rounded-full bg-[#b9ff66] px-4 py-3 text-sm font-semibold text-black"
-              >
-                Try FitFusion
-              </a>
-            </div>
-          </div>
-        )}
+        {/* Join Now Button with Neon Animation */}
+        <div className="flex-1 flex justify-end hidden md:flex">
+          <motion.button 
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="relative p-[1.5px] overflow-hidden rounded-full group transition-all duration-300"
+          >
+            {/* Rotating Neon Line */}
+            <div className="absolute inset-[-1000%] animate-[spin_4s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#b9ff66_0%,transparent_20%,#b9ff66_50%,transparent_70%,#b9ff66_100%)] opacity-100" />
+            
+            {/* Inner Button Content */}
+            <span className="relative z-10 flex items-center justify-center bg-[#0a0a0a] text-white text-xs font-bold py-2.5 px-6 rounded-full group-hover:bg-[#b9ff66] group-hover:text-black transition-all duration-300">
+              JOIN NOW
+            </span>
+          </motion.button>
+        </div>
       </div>
-    </motion.header>
+    </motion.nav>
   );
 }

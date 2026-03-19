@@ -28,10 +28,17 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} min-h-screen bg-[#050816] text-white antialiased`}
+        // 1. ADDED: flex and flex-col to stack items vertically
+        className={`${geistSans.variable} ${geistMono.variable} min-h-screen bg-[#050816] text-white antialiased flex flex-col`}
       >
         <Navbar />
-        <div className="pt-20">{children}</div>
+        
+        {/* 2. ADDED: flex-1 to push the footer to the bottom of the screen */}
+        {/* Changed from div to main for better semantic HTML */}
+        <main className="flex-1 pt-20">
+          {children}
+        </main>
+
         <Footer />
       </body>
     </html>
