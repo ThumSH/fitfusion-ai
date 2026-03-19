@@ -22,11 +22,11 @@ const team = [
   { 
     name: "Sithum Hemash",
     bio: "UG BSc (Hons) in Software Engineering",
-    imageUrl: "/sithum.png", 
+    imageUrl: "/sith.png", 
     imageFocusPosition: "center", 
     instagram: "nadini.ai",
     whatsApp: "94771111111",
-    email: "nadini@example.com" 
+    email: "h3mashed@gmail.com" 
   },
   { 
     name: "Naveed Ahamad",
@@ -58,7 +58,7 @@ const team = [
   { 
     name: "Jayavi Dias",
     bio: "Bridging the gap between complex logic and beautiful user experiences.",
-    imageUrl: "/jayavi1.png", 
+    imageUrl: "/jaya.png", 
     imageFocusPosition: "50% 30%", 
     instagram: "https://www.instagram.com/jaiya_dish_?igsh=bmZrZnNuYzl3a3Q%3D&utm_source=qr",
     whatsApp: "94724033680",
