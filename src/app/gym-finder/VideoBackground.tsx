@@ -14,7 +14,7 @@ export default function VideoBackground() {
         preload="auto"
         className="absolute inset-0 z-0 h-full w-full object-cover opacity-55"
       >
-        <source src="/find.mp4" type="video/mp4" />
+        <source src="/find.webm" type="video/webm" />
       </video>
 
       {/* Single balanced overlay */}

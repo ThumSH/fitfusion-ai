@@ -10,7 +10,7 @@ export default function VideoBackground() {
         // Increased opacity slightly to punch through the frosted glass cards
         className="absolute inset-0 z-0 h-full w-full object-cover opacity-75"
       >
-        <source src="/sliit.mp4" type="video/mp4" />
+        <source src="/sliit.webm" type="video/webm" />
         Your browser does not support the video tag.
       </video>
 

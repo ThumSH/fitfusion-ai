@@ -9,7 +9,7 @@ export default function VideoBackground() {
         preload="auto"
         className="absolute inset-0 z-0 h-full w-full object-cover object-center opacity-75"
       >
-        <source src="/food-bg.mp4" type="video/mp4" />
+        <source src="/food-bg.webm" type="video/webm" />
         Your browser does not support the video tag.
       </video>
 
