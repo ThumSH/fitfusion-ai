@@ -22,7 +22,7 @@ const team = [
   { 
     name: "Sithum Hemash",
     bio: "UG BSc (Hons) in Software Engineering",
-    imageUrl: "/sith.png", 
+    imageUrl: "/thum.png", 
     imageFocusPosition: "center", 
     instagram: "nadini.ai",
     whatsApp: "94771111111",
