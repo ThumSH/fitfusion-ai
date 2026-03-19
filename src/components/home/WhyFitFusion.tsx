@@ -32,7 +32,7 @@ export default function WhyFitFusion() {
       <div className="container-shell">
         <div className="grid gap-12 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
           <div>
-            <p className="mb-3 text-sm font-medium uppercase tracking-[0.25em] text-[#b9ff66]">
+            <p className="mb-3 text-sm font-medium uppercase tracking-[0.25em] text-primary">
               Why this works
             </p>
             <h2 className="section-title">
@@ -58,7 +58,7 @@ export default function WhyFitFusion() {
                   transition={{ duration: 0.45, delay: index * 0.08 }}
                   className="glass-card rounded-[1.75rem] p-6"
                 >
-                  <div className="mb-4 inline-flex rounded-2xl bg-white/5 p-3 text-[#b9ff66]">
+                  <div className="mb-4 inline-flex rounded-2xl bg-white/5 p-3 text-primary">
                     <Icon size={20} />
                   </div>
                   <h3 className="text-lg font-semibold text-white">

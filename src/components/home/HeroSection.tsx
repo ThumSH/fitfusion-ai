@@ -55,7 +55,7 @@ export default function HeroSection() {
 
             <div className="mt-8 flex flex-col gap-4 sm:flex-row w-full lg:w-auto">
               <a
-                href="#features"
+                href="/gym-finder"
                 className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-black transition hover:brightness-110"
               >
                 Get Started

@@ -42,20 +42,20 @@ export default function FAQSection() {
             <div 
               key={index}
               className={`border rounded-2xl transition-all duration-300 overflow-hidden ${
-                isOpen ? "bg-white/10 border-[#b9ff66]/50" : "bg-white/5 border-white/10 hover:border-white/20"
+                isOpen ? "bg-white/10 border-primary/50" : "bg-white/5 border-white/10 hover:border-white/20"
               }`}
             >
               <button 
                 onClick={() => setOpenIndex(isOpen ? null : index)}
                 className="w-full px-6 py-5 flex justify-between items-center text-left"
               >
-                <span className={`font-semibold text-lg ${isOpen ? "text-[#b9ff66]" : "text-white"}`}>
+                <span className={`font-semibold text-lg ${isOpen ? "text-primary" : "text-white"}`}>
                   {faq.question}
                 </span>
                 {isOpen ? (
-                  <Minus className="text-[#b9ff66] flex-shrink-0" size={24} />
+                  <Minus className="text-primary shrink-0" size={24} />
                 ) : (
-                  <Plus className="text-white/60 flex-shrink-0" size={24} />
+                  <Plus className="text-white/60 shrink-0" size={24} />
                 )}
               </button>
               

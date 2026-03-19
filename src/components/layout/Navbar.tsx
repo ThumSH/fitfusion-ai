@@ -27,20 +27,20 @@ export default function Navbar() {
 
   return (
     <nav
-      className={`fixed top-0 left-0 w-full z-[90] transition-all duration-300 ${
+      className={`fixed top-0 left-0 w-full z-90 transition-all duration-300 ${
         isScrolled
           ? "bg-black/85 backdrop-blur-md border-b border-white/10 py-3 shadow-lg shadow-black/50"
           : "bg-transparent py-5"
       }`}
     >
-      <div className="max-w-[1220px] mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-[auto_1fr_auto] items-center gap-6">
+      <div className="max-w-305 mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-[auto_1fr_auto] items-center gap-6">
         
         {/* LEFT: Brand Logo */}
         <div className="shrink-0">
           <Link href="/" className="flex items-center gap-2 group">
-            <Dumbbell className="text-[#b9ff66] group-hover:-rotate-45 transition-transform duration-300" size={28} />
+            <Dumbbell className="text-primary group-hover:-rotate-45 transition-transform duration-300" size={28} />
             <span className="text-xl lg:text-2xl font-bold uppercase tracking-wider text-white whitespace-nowrap">
-              Fit<span className="text-[#b9ff66]">Fusion</span>
+              Fit<span className="text-primary">Fusion</span>
             </span>
           </Link>
         </div>
@@ -51,7 +51,7 @@ export default function Navbar() {
             <Link
               key={link.name}
               href={link.href}
-              className="text-[15px] font-semibold text-white/70 hover:text-[#b9ff66] transition-colors whitespace-nowrap"
+              className="text-[15px] font-semibold text-white/70 hover:text-primary transition-colors whitespace-nowrap"
             >
               {link.name}
             </Link>
@@ -71,7 +71,7 @@ export default function Navbar() {
             {/* Inner Button Content */}
             <Link
               href="/Why"
-              className="relative z-10 flex items-center justify-center bg-[#0a0a0a] text-white text-xs font-bold py-2.5 px-6 rounded-full group-hover:bg-[#b9ff66] group-hover:text-black transition-all duration-300"
+              className="relative z-10 flex items-center justify-center bg-[#0a0a0a] text-white text-xs font-bold py-2.5 px-6 rounded-full group-hover:bg-primary group-hover:text-black transition-all duration-300"
             >
              About Us
             </Link>
@@ -81,7 +81,7 @@ export default function Navbar() {
         {/* Mobile Menu Hamburger Toggle */}
         <div className="md:hidden flex ml-auto">
           <button
-            className="text-white hover:text-[#b9ff66] transition-colors"
+            className="text-white hover:text-primary transition-colors"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           >
             {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
@@ -101,12 +101,12 @@ export default function Navbar() {
               key={link.name}
               href={link.href}
               onClick={() => setIsMobileMenuOpen(false)} // Close menu on click
-              className="text-lg font-medium text-white/70 hover:text-[#b9ff66] transition-colors"
+              className="text-lg font-medium text-white/70 hover:text-primary transition-colors"
             >
               {link.name}
             </Link>
           ))}
-          <Link href="/meal-planner#planner" className="bg-[#b9ff66] text-black px-8 py-3 rounded-full font-bold text-sm w-10/12 mt-2 text-center">
+          <Link href="/meal-planner#planner" className="bg-primary text-black px-8 py-3 rounded-full font-bold text-sm w-10/12 mt-2 text-center">
             Get Started
           </Link>
         </div>

@@ -65,9 +65,9 @@ export default function PerfectFitFusionCalculator() {
   };
 
   const DigitalInput = ({ value, setValue, label, icon: Icon, min, max, unit }: any) => (
-    <div className="relative p-5 rounded-[30px] bg-white/[0.04] border border-white/5 hover:border-[#b9ff66]/30 transition-all duration-500 shadow-lg group font-sans">
+    <div className="relative p-5 rounded-[30px] bg-white/4 border border-white/5 hover:border-primary/30 transition-all duration-500 shadow-lg group font-sans">
       <div className="flex justify-between items-center mb-3">
-        <span className="flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.2em] text-white/40 group-hover:text-[#b9ff66] transition-colors">
+        <span className="flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.2em] text-white/40 group-hover:text-primary transition-colors">
           <Icon size={12} /> {label}
         </span>
         <span className="text-[9px] font-bold text-white/20 uppercase">{unit}</span>
@@ -80,10 +80,10 @@ export default function PerfectFitFusionCalculator() {
           className="bg-transparent text-4xl font-black italic text-white focus:outline-none w-full [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
         />
         <div className="flex flex-col gap-1">
-          <button onClick={() => setValue(Math.min(max, value + 1))} className="p-1.5 bg-white/5 rounded-lg hover:bg-[#b9ff66] hover:text-black transition-all active:scale-90">
+          <button onClick={() => setValue(Math.min(max, value + 1))} className="p-1.5 bg-white/5 rounded-lg hover:bg-primary hover:text-black transition-all active:scale-90">
             <ChevronUp size={16} />
           </button>
-          <button onClick={() => setValue(Math.max(min, value - 1))} className="p-1.5 bg-white/5 rounded-lg hover:bg-[#b9ff66] hover:text-black transition-all active:scale-90">
+          <button onClick={() => setValue(Math.max(min, value - 1))} className="p-1.5 bg-white/5 rounded-lg hover:bg-primary hover:text-black transition-all active:scale-90">
             <ChevronDown size={16} />
           </button>
         </div>
@@ -97,8 +97,8 @@ export default function PerfectFitFusionCalculator() {
         className="absolute inset-0 z-0 opacity-[0.42] grayscale pointer-events-none blur-[1px]"
         style={{ backgroundImage: "url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=2070')", backgroundSize: "cover" }}
       />
-      <div className="absolute inset-0 bg-gradient-to-tr from-black via-black/85 to-[#b9ff66]/10 z-0 pointer-events-none" />
-      <div className="absolute top-[-120px] left-1/2 -translate-x-1/2 w-[600px] h-[300px] rounded-full bg-[#b9ff66]/5 blur-[80px] pointer-events-none z-0" />
+      <div className="absolute inset-0 bg-linear-to-tr from-black via-black/85 to-primary/10 z-0 pointer-events-none" />
+      <div className="absolute -top-30 left-1/2 -translate-x-1/2 w-150 h-75 rounded-full bg-primary/5 blur-[80px] pointer-events-none z-0" />
 
       <div className="relative z-10 w-full max-w-6xl flex flex-col gap-14">
         <motion.div
@@ -107,17 +107,17 @@ export default function PerfectFitFusionCalculator() {
           transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
           className="flex flex-col items-center text-center gap-5"
         >
-          <div className="flex items-center gap-2 bg-[#b9ff66]/10 border border-[#b9ff66]/20 rounded-full px-4 py-1.5">
-            <Zap size={11} className="text-[#b9ff66]" />
-            <span className="text-[10px] font-black uppercase tracking-[0.25em] text-[#b9ff66]">AI-Powered Health Analysis</span>
+          <div className="flex items-center gap-2 bg-primary/10 border border-primary/20 rounded-full px-4 py-1.5">
+            <Zap size={11} className="text-primary" />
+            <span className="text-[10px] font-black uppercase tracking-[0.25em] text-primary">AI-Powered Health Analysis</span>
           </div>
 
           <h1 className="text-6xl md:text-7xl font-black italic uppercase tracking-tighter leading-[0.9] text-white max-w-3xl">
             Know Your{" "}
             <span className="relative inline-block">
-              <span className="text-[#b9ff66]">Body.</span>
+              <span className="text-primary">Body.</span>
               <motion.span
-                className="absolute -bottom-1 left-0 h-[3px] bg-[#b9ff66] rounded-full"
+                className="absolute -bottom-1 left-0 h-0.75 bg-primary rounded-full"
                 initial={{ scaleX: 0 }}
                 animate={{ scaleX: 1 }}
                 transition={{ delay: 0.5, duration: 0.6, ease: "easeOut" }}
@@ -132,7 +132,7 @@ export default function PerfectFitFusionCalculator() {
           </p>
 
           <div className="flex items-center gap-3 mt-1">
-            <Heart size={13} className="text-[#b9ff66] animate-pulse" />
+            <Heart size={13} className="text-primary animate-pulse" />
             <span className="text-[10px] font-black uppercase tracking-widest text-white/20">Used by 50,000+ athletes and health enthusiasts</span>
           </div>
         </motion.div>
@@ -149,10 +149,10 @@ export default function PerfectFitFusionCalculator() {
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 + i * 0.08, duration: 0.5 }}
-              className="group flex flex-col items-start gap-3 p-5 rounded-[24px] bg-white/[0.03] border border-white/5 hover:border-[#b9ff66]/25 hover:bg-white/[0.06] transition-all duration-400 cursor-default"
+              className="group flex flex-col items-start gap-3 p-5 rounded-3xl bg-white/3 border border-white/5 hover:border-primary/25 hover:bg-white/6 transition-all duration-400 cursor-default"
             >
-              <div className="w-9 h-9 flex items-center justify-center rounded-xl bg-[#b9ff66]/10 group-hover:bg-[#b9ff66]/20 transition-colors">
-                <Icon size={17} className="text-[#b9ff66]" />
+              <div className="w-9 h-9 flex items-center justify-center rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                <Icon size={17} className="text-primary" />
               </div>
               <div>
                 <p className="text-[11px] font-black uppercase tracking-wider text-white/80 group-hover:text-white transition-colors leading-none">{label}</p>
@@ -170,19 +170,19 @@ export default function PerfectFitFusionCalculator() {
         >
           <div className="lg:col-span-7 space-y-5">
             <h2 className="text-4xl font-black italic text-white tracking-tighter uppercase leading-none">
-              Body <span className="text-[#b9ff66]">Composition.</span>
+              Body <span className="text-primary">Composition.</span>
             </h2>
 
-            <div className="relative p-5 rounded-[30px] bg-white/[0.04] border border-white/5 hover:border-[#b9ff66]/30 transition-all duration-500 shadow-lg group">
+            <div className="relative p-5 rounded-[30px] bg-white/4 border border-white/5 hover:border-primary/30 transition-all duration-500 shadow-lg group">
               <div className="flex justify-between items-center mb-3">
-                <span className="flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.2em] text-white/40 group-hover:text-[#b9ff66] transition-colors">
+                <span className="flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.2em] text-white/40 group-hover:text-primary transition-colors">
                   <Users size={12} /> Gender
                 </span>
                 <span className="text-[9px] font-bold text-white/20 uppercase italic">Identification</span>
               </div>
               <div className="relative flex bg-black/40 p-1 rounded-2xl border border-white/5 overflow-hidden">
                 <motion.div
-                  className="absolute top-1 bottom-1 rounded-xl bg-[#b9ff66]"
+                  className="absolute top-1 bottom-1 rounded-xl bg-primary"
                   animate={{ x: gender === "male" ? "0%" : "100%" }}
                   transition={{ type: "spring", stiffness: 450, damping: 35 }}
                   style={{ width: "calc(50% - 4px)", left: gender === "male" ? 4 : -4 }}
@@ -210,20 +210,20 @@ export default function PerfectFitFusionCalculator() {
 
             <button
               onClick={calculateBMI}
-              className="relative w-full bg-[#b9ff66] text-black font-black py-6 rounded-[30px] uppercase italic tracking-widest text-lg transition-all duration-300 hover:shadow-[0_0_50px_-5px_rgba(185,255,102,0.55)] hover:scale-[1.01] active:scale-[0.98] border-none outline-none overflow-hidden group"
+              className="relative w-full bg-primary text-black font-black py-6 rounded-[30px] uppercase italic tracking-widest text-lg transition-all duration-300 hover:shadow-[0_0_50px_-5px_rgba(185,255,102,0.55)] hover:scale-[1.01] active:scale-[0.98] border-none outline-none overflow-hidden group"
             >
               <span className="relative z-10">Generate Report</span>
               <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 skew-y-12 transition-transform duration-500" />
             </button>
           </div>
 
-          <div className="lg:col-span-5 flex items-stretch h-full min-h-[550px]">
+          <div className="lg:col-span-5 flex items-stretch h-full min-h-137.5">
             <AnimatePresence mode="wait">
               {bmi ? (
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="w-full bg-white/[0.04] backdrop-blur-3xl rounded-[60px] p-12 flex flex-col justify-between relative shadow-2xl overflow-hidden border border-white/10"
+                  className="w-full bg-white/4 backdrop-blur-3xl rounded-[60px] p-12 flex flex-col justify-between relative shadow-2xl overflow-hidden border border-white/10"
                 >
                   <svg className="absolute inset-0 w-full h-full pointer-events-none overflow-visible" fill="none">
                     <motion.rect
@@ -278,7 +278,7 @@ export default function PerfectFitFusionCalculator() {
                   </div>
                 </motion.div>
               ) : (
-                <div className="w-full flex items-center justify-center bg-white/[0.01] rounded-[60px] border border-dashed border-white/10 opacity-30 italic uppercase tracking-widest text-sm text-white text-center p-10">
+                <div className="w-full flex items-center justify-center bg-white/1 rounded-[60px] border border-dashed border-white/10 opacity-30 italic uppercase tracking-widest text-sm text-white text-center p-10">
                   Enter your details to generate <br /> your AI health profile
                 </div>
               )}

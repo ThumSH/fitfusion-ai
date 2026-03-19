@@ -50,7 +50,7 @@ const STEPS = [
 function Barbell() {
   return (
     <div className="relative flex items-center justify-center">
-      <div className="absolute w-48 h-48 rounded-full bg-[#b9ff66]/10 blur-[60px]" />
+      <div className="absolute w-48 h-48 rounded-full bg-primary/10 blur-[60px]" />
 
       <motion.div animate={{ y: [0, -14, 0] }} transition={{ duration: 2.8, ease: "easeInOut", repeat: Infinity }} className="relative z-10">
         <svg width="260" height="88" viewBox="0 0 260 88" fill="none">
@@ -65,7 +65,7 @@ function Barbell() {
           {[4, 3, 2].map((h, i) => (
             <motion.div
               key={i}
-              className="w-[2px] rounded-full bg-[#b9ff66]"
+              className="w-0.5 rounded-full bg-primary"
               style={{ height: h * 4 }}
               animate={{ opacity: [0.6, 0.15, 0.6] }}
               transition={{ duration: 1.4, delay: i * 0.15, repeat: Infinity }}
@@ -75,11 +75,11 @@ function Barbell() {
       </motion.div>
 
       <motion.div
-        className="absolute w-40 h-40 rounded-full border border-[#b9ff66]/10"
+        className="absolute w-40 h-40 rounded-full border border-primary/10"
         animate={{ rotate: 360 }}
         transition={{ duration: 12, ease: "linear", repeat: Infinity }}
       >
-        <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-[#b9ff66]/60" />
+        <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-primary/60" />
       </motion.div>
     </div>
   );
@@ -94,19 +94,19 @@ function StepCard({ step, index, active }: { step: typeof STEPS[0]; index: numbe
       transition={{ duration: 0.65, delay: index * 0.15, ease: [0.22, 1, 0.36, 1] }}
       className={`group relative flex flex-col gap-6 p-8 rounded-[30px] border transition-all duration-500 cursor-default overflow-hidden ${
         step.featured
-          ? "bg-[#b9ff66]/8 border-[#b9ff66]/25 hover:border-[#b9ff66]/50"
-          : "bg-white/[0.03] border-white/8 hover:border-[#b9ff66]/30 hover:bg-white/[0.06]"
+          ? "bg-primary/8 border-primary/25 hover:border-primary/50"
+          : "bg-white/3 border-white/8 hover:border-primary/30 hover:bg-white/6"
       }`}
     >
-      <span className="absolute top-5 right-6 text-8xl font-black italic text-white/[0.04] select-none leading-none pointer-events-none">{step.number}</span>
+      <span className="absolute top-5 right-6 text-8xl font-black italic text-white/4 select-none leading-none pointer-events-none">{step.number}</span>
 
       <div className="flex items-start justify-between">
         <div
           className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-300 ${
-            step.featured ? "bg-[#b9ff66]/15 group-hover:bg-[#b9ff66]/25" : "bg-white/[0.06] group-hover:bg-[#b9ff66]/12"
+            step.featured ? "bg-primary/15 group-hover:bg-primary/25" : "bg-white/6 group-hover:bg-primary/12"
           }`}
         >
-          <Icon size={22} className="text-[#b9ff66]" />
+          <Icon size={22} className="text-primary" />
         </div>
         <span className={`text-[10px] font-black uppercase tracking-[0.22em] px-3 py-1.5 rounded-full border border-white/10 ${step.tagColor}`}>{step.tag}</span>
       </div>
@@ -119,7 +119,7 @@ function StepCard({ step, index, active }: { step: typeof STEPS[0]; index: numbe
       <p className="text-base text-white/58 leading-relaxed font-medium">{step.description}</p>
 
       <motion.div
-        className="absolute bottom-0 left-8 right-8 h-[1.5px] rounded-full bg-[#b9ff66]"
+        className="absolute bottom-0 left-8 right-8 h-[1.5px] rounded-full bg-primary"
         initial={{ scaleX: 0 }}
         animate={active ? { scaleX: 1 } : {}}
         transition={{ delay: 0.6 + index * 0.15, duration: 0.5, ease: "easeOut" }}
@@ -135,7 +135,7 @@ export default function UsageShowcase() {
 
   return (
     <section ref={ref} className="w-full py-28 relative overflow-hidden bg-black">
-      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[700px] h-[300px] bg-[#b9ff66]/4 blur-[120px] pointer-events-none" />
+      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-175 h-75 bg-primary/4 blur-[120px] pointer-events-none" />
 
       <div className="relative z-10 max-w-6xl mx-auto px-6 flex flex-col gap-16">
         <motion.div
@@ -144,17 +144,17 @@ export default function UsageShowcase() {
           transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
           className="flex flex-col items-center text-center gap-5"
         >
-          <div className="flex items-center gap-2 bg-[#b9ff66]/10 border border-[#b9ff66]/20 rounded-full px-4 py-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#b9ff66] animate-pulse" />
-            <span className="text-[10px] font-black uppercase tracking-[0.25em] text-[#b9ff66]">How It Works</span>
+          <div className="flex items-center gap-2 bg-primary/10 border border-primary/20 rounded-full px-4 py-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+            <span className="text-[10px] font-black uppercase tracking-[0.25em] text-primary">How It Works</span>
           </div>
 
           <h2 className="text-5xl md:text-6xl font-black italic uppercase tracking-tighter leading-[0.9] text-white">
             Master Your{" "}
             <span className="relative inline-block">
-              <span className="text-[#b9ff66]">Routine.</span>
+              <span className="text-primary">Routine.</span>
               <motion.span
-                className="absolute -bottom-1 left-0 h-[2px] bg-[#b9ff66] rounded-full"
+                className="absolute -bottom-1 left-0 h-0.5 bg-primary rounded-full"
                 initial={{ scaleX: 0 }}
                 animate={isInView ? { scaleX: 1 } : {}}
                 transition={{ delay: 0.5, duration: 0.55, ease: "easeOut" }}
@@ -187,7 +187,7 @@ export default function UsageShowcase() {
             initial={{ opacity: 0, scale: 0.85 }}
             animate={isInView ? { opacity: 1, scale: 1 } : {}}
             transition={{ delay: 0.3, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-            className="flex items-center justify-center lg:py-10 lg:px-4 min-h-[200px]"
+            className="flex items-center justify-center lg:py-10 lg:px-4 min-h-50"
           >
             <Barbell />
           </motion.div>
@@ -218,8 +218,8 @@ export default function UsageShowcase() {
             { val: "Workout + Meal", label: "Unified Planning" },
             { val: "Home To Gym", label: "Adaptive Guidance" },
           ].map((m) => (
-            <div key={m.label} className="flex flex-col items-center text-center gap-1 py-5 rounded-2xl bg-white/[0.03] border border-white/8">
-              <span className="text-2xl font-black italic text-[#b9ff66] tracking-tighter">{m.val}</span>
+            <div key={m.label} className="flex flex-col items-center text-center gap-1 py-5 rounded-2xl bg-white/3 border border-white/8">
+              <span className="text-2xl font-black italic text-primary tracking-tighter">{m.val}</span>
               <span className="text-[10px] font-black uppercase tracking-widest text-white/35">{m.label}</span>
             </div>
           ))}
@@ -229,12 +229,12 @@ export default function UsageShowcase() {
           initial={{ opacity: 0, y: 16 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ delay: 0.6, duration: 0.55 }}
-          className="flex flex-col sm:flex-row items-center justify-between gap-6 py-7 px-8 rounded-[28px] bg-white/[0.03] border border-white/8"
+          className="flex flex-col sm:flex-row items-center justify-between gap-6 py-7 px-8 rounded-[28px] bg-white/3 border border-white/8"
         >
           <p className="text-base font-bold italic text-white/50 text-center sm:text-left max-w-md">
             Join <span className="text-white/80">50,000+ users</span> using FitFusion to train smarter, eat better, and stay consistent with AI support.
           </p>
-          <button className="shrink-0 bg-[#b9ff66] text-black font-black uppercase italic tracking-widest text-sm px-8 py-4 rounded-2xl hover:shadow-[0_0_30px_-5px_rgba(185,255,102,0.5)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-300">
+          <button className="shrink-0 bg-primary text-black font-black uppercase italic tracking-widest text-sm px-8 py-4 rounded-2xl hover:shadow-[0_0_30px_-5px_rgba(185,255,102,0.5)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-300">
             Build My Plan
           </button>
         </motion.div>

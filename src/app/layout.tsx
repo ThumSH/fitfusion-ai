@@ -18,6 +18,11 @@ export const metadata: Metadata = {
   title: "FitFusion AI | Smarter Workouts. Better Meals.",
   description:
     "AI-powered workout planning, meal analysis, and beginner meal schedules for real people.",
+  icons: {
+    icon: [{ url: "/logo-x.svg", type: "image/svg" }],
+    shortcut: "/logo-x.svg",
+    apple: "/logo-x.svg",
+  },
 };
 
 export default function RootLayout({
@@ -28,7 +33,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} min-h-screen bg-[var(--color-background)] text-[var(--color-foreground)] antialiased flex flex-col`}
+        className={`${geistSans.variable} ${geistMono.variable} min-h-screen bg-background text-(--color-foreground) antialiased flex flex-col`}
       >
         <Navbar />
         <main className="flex-1 pt-20">

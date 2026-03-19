@@ -15,6 +15,7 @@ import {
   Wheat,
   X,
 } from "lucide-react";
+import Image from "next/image";
 
 interface Verdict {
   goal: string;
@@ -166,14 +167,14 @@ export default function MealImageAnalyzerPanel() {
       animate={{ opacity: 1, y: 0 }}
     >
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-4">
-        <h2 className="flex items-center gap-2 text-xl font-black uppercase tracking-wide text-[#b9ff66]">
+        <h2 className="flex items-center gap-2 text-xl font-black uppercase tracking-wide text-primary">
           <Camera size={22} />
           Meal Image Analyzer
         </h2>
         <button
           type="button"
           onClick={resetAnalyzer}
-          className="rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-xs font-semibold uppercase tracking-wider text-white/80 transition-colors hover:border-[#b9ff66]/40 hover:text-[#b9ff66]"
+          className="rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-xs font-semibold uppercase tracking-wider text-white/80 transition-colors hover:border-primary/40 hover:text-primary"
         >
           Reset
         </button>
@@ -186,7 +187,7 @@ export default function MealImageAnalyzerPanel() {
             <select
               value={selectedGoal}
               onChange={(event) => setSelectedGoal(event.target.value)}
-              className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white focus:border-[#b9ff66] focus:outline-none focus:ring-1 focus:ring-[#b9ff66] [&>option]:bg-[#0a0a0a]"
+              className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary [&>option]:bg-[#0a0a0a]"
             >
               {FITNESS_GOALS.map((goal) => (
                 <option key={goal.id} value={goal.id}>
@@ -224,7 +225,7 @@ export default function MealImageAnalyzerPanel() {
 
             {imagePreview ? (
               <div className="relative">
-                <img
+                <Image
                   src={imagePreview}
                   alt="Meal preview"
                   className="h-64 w-full rounded-xl object-cover sm:h-72"
@@ -235,15 +236,15 @@ export default function MealImageAnalyzerPanel() {
                     event.stopPropagation();
                     resetAnalyzer();
                   }}
-                  className="absolute right-2 top-2 rounded-full border border-white/20 bg-black/70 p-1.5 text-white/90 transition-colors hover:border-[#b9ff66]/40 hover:text-[#b9ff66]"
+                  className="absolute right-2 top-2 rounded-full border border-white/20 bg-black/70 p-1.5 text-white/90 transition-colors hover:border-primary/40 hover:text-primary"
                 >
                   <X size={14} />
                 </button>
               </div>
             ) : (
               <div className="flex h-64 flex-col items-center justify-center text-center sm:h-72">
-                <div className="mb-3 rounded-2xl border border-[#b9ff66]/30 bg-[#b9ff66]/10 p-4">
-                  <Upload size={24} className="text-[#b9ff66]" />
+                <div className="mb-3 rounded-2xl border border-primary/30 bg-primary/10 p-4">
+                  <Upload size={24} className="text-primary" />
                 </div>
                 <p className="text-sm font-semibold text-white">Drop your meal image here</p>
                 <p className="mt-1 text-xs text-white/60">or click to upload</p>
@@ -255,7 +256,7 @@ export default function MealImageAnalyzerPanel() {
             type="button"
             onClick={analyzeMeal}
             disabled={loading || !imagePreview}
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#b9ff66] px-6 py-3.5 text-sm font-black uppercase tracking-widest text-black transition-all hover:bg-white hover:shadow-[0_0_20px_rgba(185,255,102,0.4)] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:bg-[#b9ff66] disabled:hover:shadow-none"
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3.5 text-sm font-black uppercase tracking-widest text-black transition-all hover:bg-white hover:shadow-[0_0_20px_rgba(185,255,102,0.4)] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:bg-primary disabled:hover:shadow-none"
           >
             {loading ? (
               <>
@@ -271,8 +272,8 @@ export default function MealImageAnalyzerPanel() {
           </button>
 
           {error && (
-            <div className="flex items-start gap-2 rounded-xl border border-[#b9ff66]/30 bg-[#b9ff66]/8 p-3.5">
-              <AlertTriangle size={16} className="mt-0.5 shrink-0 text-[#b9ff66]" />
+            <div className="flex items-start gap-2 rounded-xl border border-primary/30 bg-primary/8 p-3.5">
+              <AlertTriangle size={16} className="mt-0.5 shrink-0 text-primary" />
               <p className="text-sm text-white/85">{error}</p>
             </div>
           )}
@@ -280,8 +281,8 @@ export default function MealImageAnalyzerPanel() {
 
         <div className="rounded-2xl border border-white/10 bg-black/30 p-5">
           {!result ? (
-            <div className="flex h-full min-h-[300px] flex-col items-center justify-center text-center">
-              <Camera size={28} className="text-[#b9ff66]" />
+            <div className="flex h-full min-h-75 flex-col items-center justify-center text-center">
+              <Camera size={28} className="text-primary" />
               <p className="mt-3 text-sm font-semibold text-white">No analysis yet</p>
               <p className="mt-1 max-w-xs text-xs text-white/60">
                 Upload a meal image and run analysis to get calories, macros, and goal compatibility.
@@ -291,7 +292,7 @@ export default function MealImageAnalyzerPanel() {
             <div className="space-y-5">
               <div className="border-b border-white/10 pb-4">
                 <h3 className="text-xl font-black text-white">{result.meal_name}</h3>
-                <div className="mt-2 inline-flex items-center gap-1.5 rounded-full border border-[#b9ff66]/30 bg-[#b9ff66]/10 px-3 py-1 text-xs font-semibold text-[#b9ff66]">
+                <div className="mt-2 inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
                   <Flame size={12} /> {result.calories} kcal
                 </div>
                 <p className="mt-2 text-xs text-white/60">{result.portion_size}</p>
@@ -299,7 +300,7 @@ export default function MealImageAnalyzerPanel() {
 
               <div className="grid grid-cols-3 gap-2">
                 <div className="rounded-xl border border-white/10 bg-white/5 p-3 text-center">
-                  <Beef size={14} className="mx-auto text-[#b9ff66]" />
+                  <Beef size={14} className="mx-auto text-primary" />
                   <p className="mt-1 text-lg font-bold text-white">{result.protein_g}g</p>
                   <p className="text-[11px] text-white/60">Protein</p>
                 </div>
@@ -320,7 +321,7 @@ export default function MealImageAnalyzerPanel() {
                 <p className="text-sm leading-relaxed text-white/80">{result.summary}</p>
               </div>
 
-              <div className="rounded-xl border border-[#b9ff66]/25 bg-[#b9ff66]/10 p-3.5">
+              <div className="rounded-xl border border-primary/25 bg-primary/10 p-3.5">
                 <p className="text-xs font-semibold uppercase tracking-wider text-[#dcf8b4]">Pro Tip</p>
                 <p className="mt-1 text-sm text-white/85">{result.tip}</p>
               </div>

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import { useMemo, useState } from "react";
@@ -132,11 +133,11 @@ export default function WorkoutPlanPanel() {
         style={{ boxShadow: "0 4px 40px rgba(0,0,0,0.35)" }}
       >
         <div className="mb-6 flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-4">
-          <h2 className="flex items-center gap-2 text-2xl font-black uppercase tracking-wide text-[#b9ff66]">
+          <h2 className="flex items-center gap-2 text-2xl font-black uppercase tracking-wide text-primary">
             <Dumbbell size={22} />
             AI Workout Planner
           </h2>
-          <div className="inline-flex items-center gap-1.5 rounded-full border border-[#b9ff66]/25 bg-[#b9ff66]/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-[#dff8be]">
+          <div className="inline-flex items-center gap-1.5 rounded-full border border-primary/25 bg-primary/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-[#dff8be]">
             <Sparkles size={12} />
             Gemini Live
           </div>
@@ -148,7 +149,7 @@ export default function WorkoutPlanPanel() {
               key={`${item.label}-${idx}`}
               className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-white/80"
             >
-              <span className="text-[#b9ff66]">{item.icon}</span>
+              <span className="text-primary">{item.icon}</span>
               {item.label}
             </span>
           ))}
@@ -274,7 +275,7 @@ export default function WorkoutPlanPanel() {
           <button
             type="submit"
             disabled={loading}
-            className="group mt-2 flex w-full items-center justify-center gap-2 rounded-xl bg-[#b9ff66] px-6 py-4 text-sm font-black uppercase tracking-widest text-black transition-all hover:bg-white hover:shadow-[0_0_20px_rgba(185,255,102,0.45)] disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:bg-[#b9ff66] disabled:hover:shadow-none"
+            className="group mt-2 flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-6 py-4 text-sm font-black uppercase tracking-widest text-black transition-all hover:bg-white hover:shadow-[0_0_20px_rgba(185,255,102,0.45)] disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:bg-primary disabled:hover:shadow-none"
           >
             {loading ? (
               <>
@@ -311,18 +312,18 @@ export default function WorkoutPlanPanel() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="rounded-3xl border border-[#b9ff66]/20 bg-black/25 p-6 backdrop-blur-2xl sm:p-10"
+          className="rounded-3xl border border-primary/20 bg-black/25 p-6 backdrop-blur-2xl sm:p-10"
           style={{ boxShadow: "0 8px 42px rgba(185,255,102,0.08)" }}
         >
-          <div className="mb-8 flex flex-wrap items-center justify-between gap-3 border-b border-[#b9ff66]/10 pb-4">
-            <h3 className="flex items-center gap-3 text-2xl font-black uppercase tracking-wide text-[#b9ff66]">
+          <div className="mb-8 flex flex-wrap items-center justify-between gap-3 border-b border-primary/10 pb-4">
+            <h3 className="flex items-center gap-3 text-2xl font-black uppercase tracking-wide text-primary">
               <Dumbbell size={24} />
               Your Workout Blueprint
             </h3>
             <button
               type="button"
               onClick={copyPlan}
-              className="inline-flex items-center gap-1.5 rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-xs font-semibold uppercase tracking-wider text-white/80 transition-colors hover:border-[#b9ff66]/40 hover:text-[#b9ff66]"
+              className="inline-flex items-center gap-1.5 rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-xs font-semibold uppercase tracking-wider text-white/80 transition-colors hover:border-primary/40 hover:text-primary"
             >
               {copied ? <ClipboardCheck size={14} /> : <ClipboardCopy size={14} />}
               {copied ? "Copied" : "Copy"}
@@ -336,20 +337,20 @@ export default function WorkoutPlanPanel() {
                   <h1 className="mb-4 mt-8 text-3xl font-black uppercase tracking-wide text-white" {...props} />
                 ),
                 h2: ({node, ...props}) => (
-                  <h2 className="mb-4 mt-8 text-xl font-bold uppercase tracking-wider text-[#b9ff66]" {...props} />
+                  <h2 className="mb-4 mt-8 text-xl font-bold uppercase tracking-wider text-primary" {...props} />
                 ),
                 h3: ({node, ...props}) => <h3 className="mb-3 mt-6 text-lg font-semibold text-white/90" {...props} />,
                 p: ({node, ...props}) => <p className="mb-4 text-sm leading-relaxed text-white/75" {...props} />,
                 ul: ({node, ...props}) => (
-                  <ul className="mb-6 ml-6 list-outside list-disc space-y-2 text-sm marker:text-[#b9ff66]" {...props} />
+                  <ul className="mb-6 ml-6 list-outside list-disc space-y-2 text-sm marker:text-primary" {...props} />
                 ),
                 ol: ({node, ...props}) => (
-                  <ol className="mb-6 ml-6 list-outside list-decimal space-y-2 text-sm text-white/75 marker:text-[#b9ff66]" {...props} />
+                  <ol className="mb-6 ml-6 list-outside list-decimal space-y-2 text-sm text-white/75 marker:text-primary" {...props} />
                 ),
                 li: ({node, ...props}) => <li className="pl-1 text-white/75" {...props} />,
                 strong: ({node, ...props}) => (
                   <strong
-                    className="rounded border border-[#b9ff66]/20 bg-[#b9ff66]/10 px-1.5 py-0.5 font-semibold text-white"
+                    className="rounded border border-primary/20 bg-primary/10 px-1.5 py-0.5 font-semibold text-white"
                     {...props}
                   />
                 ),
@@ -360,7 +361,7 @@ export default function WorkoutPlanPanel() {
                 ),
                 th: ({node, ...props}) => (
                   <th
-                    className="border-b border-[#b9ff66]/30 px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#b9ff66]"
+                    className="border-b border-primary/30 px-4 py-3 text-xs font-semibold uppercase tracking-wider text-primary"
                     {...props}
                   />
                 ),

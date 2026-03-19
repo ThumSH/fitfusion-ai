@@ -61,11 +61,11 @@ function StatCard({ stat, index, active }: { stat: Stat; index: number; active: 
 
       {/* Icon pill */}
       <div className="relative mb-5">
-        <div className="w-14 h-14 rounded-2xl bg-[#b9ff66]/10 border border-[#b9ff66]/15 flex items-center justify-center transition-all duration-300 group-hover:bg-[#b9ff66]/20 group-hover:scale-110 group-hover:border-[#b9ff66]/30">
+        <div className="w-14 h-14 rounded-2xl bg-primary/10 border border-primary/15 flex items-center justify-center transition-all duration-300 group-hover:bg-primary/20 group-hover:scale-110 group-hover:border-primary/30">
           {stat.icon}
         </div>
         {/* Glow dot */}
-        <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-[#b9ff66] shadow-[0_0_8px_2px_rgba(185,255,102,0.6)] animate-pulse" />
+        <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-primary shadow-[0_0_8px_2px_rgba(185,255,102,0.6)] animate-pulse" />
       </div>
 
       {/* Counter */}
@@ -75,7 +75,7 @@ function StatCard({ stat, index, active }: { stat: Stat; index: number; active: 
         </h3>
         {/* Subtle underline accent */}
         <motion.div
-          className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 h-[2px] bg-[#b9ff66] rounded-full"
+          className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 h-0.5 bg-primary rounded-full"
           initial={{ width: 0 }}
           animate={active ? { width: "60%" } : {}}
           transition={{ delay: 0.8 + index * 0.12, duration: 0.5, ease: "easeOut" }}
@@ -90,7 +90,7 @@ function StatCard({ stat, index, active }: { stat: Stat; index: number; active: 
       {/* Sub-label with change badge */}
       <div className="mt-2 flex items-center gap-1.5">
         <span className="text-[10px] font-bold text-white/25">{stat.sublabel}</span>
-        <span className="flex items-center gap-0.5 bg-[#b9ff66]/10 border border-[#b9ff66]/20 rounded-full px-2 py-0.5 text-[9px] font-black text-[#b9ff66] uppercase tracking-wider">
+        <span className="flex items-center gap-0.5 bg-primary/10 border border-primary/20 rounded-full px-2 py-0.5 text-[9px] font-black text-primary uppercase tracking-wider">
           <ArrowUpRight size={9} />
           {stat.change}
         </span>
@@ -105,7 +105,7 @@ export default function StatsStrip() {
 
   const stats: Stat[] = [
     {
-      icon: <Users className="text-[#b9ff66]" size={22} />,
+      icon: <Users className="text-primary" size={22} />,
       rawValue: 50000,
       suffix: "+",
       display: "50K+",
@@ -114,7 +114,7 @@ export default function StatsStrip() {
       change: "+12% mo",
     },
     {
-      icon: <Activity className="text-[#b9ff66]" size={22} />,
+      icon: <Activity className="text-primary" size={22} />,
       rawValue: 1200000,
       suffix: "M",
       display: "1.2M",
@@ -123,7 +123,7 @@ export default function StatsStrip() {
       change: "+8% wk",
     },
     {
-      icon: <Flame className="text-[#b9ff66]" size={22} />,
+      icon: <Flame className="text-primary" size={22} />,
       rawValue: 850000,
       suffix: "K",
       display: "850K",
@@ -132,7 +132,7 @@ export default function StatsStrip() {
       change: "+5% wk",
     },
     {
-      icon: <Trophy className="text-[#b9ff66]" size={22} />,
+      icon: <Trophy className="text-primary" size={22} />,
       rawValue: 99,
       suffix: "%",
       display: "99%",
@@ -145,11 +145,11 @@ export default function StatsStrip() {
   return (
     <section ref={ref} className="w-full relative py-20 overflow-hidden">
       {/* Background strip */}
-      <div className="absolute inset-0 bg-white/[0.025] border-y border-white/10 backdrop-blur-md z-0" />
+      <div className="absolute inset-0 bg-white/2.5 border-y border-white/10 backdrop-blur-md z-0" />
 
       {/* Ambient orbs */}
-      <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-80 h-80 bg-[#b9ff66]/6 rounded-full blur-[100px] pointer-events-none z-0" />
-      <div className="absolute top-1/2 right-1/4 -translate-y-1/2 w-80 h-80 bg-[#b9ff66]/6 rounded-full blur-[100px] pointer-events-none z-0" />
+      <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-80 h-80 bg-primary/6 rounded-full blur-[100px] pointer-events-none z-0" />
+      <div className="absolute top-1/2 right-1/4 -translate-y-1/2 w-80 h-80 bg-primary/6 rounded-full blur-[100px] pointer-events-none z-0" />
 
       {/* Scanline texture overlay */}
       <div
