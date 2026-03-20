@@ -2,33 +2,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence, Variants } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { muscleData } from "./Data";
 import type { MuscleGroupId, SubMuscle } from "./ideal";
 
 type MuscleInfoPanelProps = {
   selected: MuscleGroupId | null;
-};
-
-const mapContainerVariants: Variants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      delayChildren: 0.3,
-      staggerChildren: 0.12,
-    },
-  },
-};
-
-const nodeVariants: Variants = {
-  hidden: { opacity: 0, scale: 0, y: 10 },
-  visible: {
-    opacity: 1,
-    scale: 1,
-    y: 0,
-    transition: { type: "spring", stiffness: 400, damping: 15 },
-  },
 };
 
 export default function MuscleInfoPanel({ selected }: MuscleInfoPanelProps) {
@@ -62,12 +41,14 @@ export default function MuscleInfoPanel({ selected }: MuscleInfoPanelProps) {
           transition={{ duration: 0.3, ease: "easeOut" }}
           className="flex h-full flex-col"
         >
-          <div className="mb-6 border-b border-white/10 pb-4">
+          {/* Header */}
+          <div className="mb-5 border-b border-white/10 pb-4">
             <p className="text-sm uppercase tracking-[0.2em] text-primary">{group.label} Anatomy</p>
             <p className="mt-2 text-sm leading-6 text-white/70">{group.description}</p>
           </div>
 
-          <div className="relative mb-6 h-56 w-full overflow-hidden rounded-xl border border-white/10 bg-[#090909] p-4 shadow-[inset_0_4px_20px_rgba(0,0,0,0.5)]">
+          {/* Anatomy Image — clean, no overlay nodes */}
+          <div className="relative mb-5 h-48 w-full overflow-hidden rounded-xl border border-white/10 bg-[#090909] shadow-[inset_0_4px_20px_rgba(0,0,0,0.5)]">
             <p className="absolute left-4 top-3 z-20 text-xs font-semibold uppercase tracking-wider text-white/40">
               Structural Map
             </p>
@@ -79,82 +60,88 @@ export default function MuscleInfoPanel({ selected }: MuscleInfoPanelProps) {
               initial={{ opacity: 0, scale: 0.95, filter: "blur(10px)" }}
               animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
               transition={{ duration: 0.6, ease: "easeOut" }}
-              className="absolute inset-0 h-full w-full object-contain p-2 drop-shadow-[0_0_15px_rgba(185,255,102,0.08)]"
+              className="absolute inset-0 h-full w-full object-contain p-3 drop-shadow-[0_0_15px_rgba(185,255,102,0.08)]"
             />
+          </div>
 
-            <motion.div variants={mapContainerVariants} initial="hidden" animate="visible" className="absolute inset-0 z-10">
-              {group.subMuscles?.map((sub, index) => {
+          {/* Sub-Muscle List — replaces inaccurate overlay nodes */}
+          <div className="mb-5">
+            <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-white/40">
+              Muscle Regions
+            </p>
+            <div className="space-y-1.5">
+              {group.subMuscles.map((sub, index) => {
                 const isActive = activeSubMuscle?.name === sub.name;
 
                 return (
                   <motion.div
-                    key={`${selected}-${index}`}
-                    variants={nodeVariants}
-                    className="group absolute flex cursor-pointer flex-col items-center justify-center"
-                    style={{
-                      top: `${sub.y}%`,
-                      left: `${sub.x}%`,
-                      transform: "translate(-50%, -50%)",
+                    key={`${selected}-sub-${index}`}
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{
+                      delay: 0.15 + index * 0.06,
+                      duration: 0.3,
+                      ease: "easeOut",
                     }}
+                    className={`group cursor-pointer rounded-lg border px-3.5 py-2.5 transition-all duration-250 ${
+                      isActive
+                        ? "border-primary/30 bg-primary/8"
+                        : "border-white/6 bg-white/2 hover:border-white/12 hover:bg-white/4"
+                    }`}
                     onMouseEnter={() => setActiveSubMuscle(sub)}
                     onMouseLeave={() => setActiveSubMuscle(null)}
                   >
-                    <div className="relative flex h-6 w-6 items-center justify-center transition-transform duration-300 group-hover:scale-125">
+                    <div className="flex items-center gap-3">
+                      {/* Index pip */}
                       <div
-                        className={`absolute h-full w-full rounded-full transition-all duration-300 ${
-                          isActive ? "scale-150 animate-pulse bg-primary/40" : "bg-white/10"
+                        className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[9px] font-bold tracking-wide transition-colors duration-250 ${
+                          isActive
+                            ? "bg-primary/25 text-primary"
+                            : "bg-white/8 text-white/35 group-hover:text-white/50"
                         }`}
-                      />
-                      <div
-                        className={`z-10 h-2.5 w-2.5 rounded-full transition-colors duration-300 ${
-                          isActive ? "bg-primary shadow-[0_0_12px_#b9ff66]" : "bg-white/70 group-hover:bg-white"
+                      >
+                        {String(index + 1).padStart(2, "0")}
+                      </div>
+
+                      <span
+                        className={`text-xs font-medium transition-colors duration-250 ${
+                          isActive ? "text-primary" : "text-white/70 group-hover:text-white/85"
                         }`}
-                      />
+                      >
+                        {sub.name}
+                      </span>
+
+                      {/* Active indicator dot */}
+                      {isActive && (
+                        <motion.div
+                          layoutId="active-muscle-dot"
+                          className="ml-auto h-1.5 w-1.5 rounded-full bg-primary shadow-[0_0_8px_rgba(185,255,102,0.5)]"
+                        />
+                      )}
                     </div>
 
-                    <span
-                      className={`absolute top-7 w-max rounded-md bg-black/40 px-1.5 py-0.5 text-[10px] font-medium tracking-wide backdrop-blur-sm transition-colors duration-300 ${
-                        isActive
-                          ? "text-primary border border-primary/30"
-                          : "text-white/60 border border-transparent group-hover:text-white"
-                      }`}
-                    >
-                      {sub.name.split(" ").slice(0, 2).join(" ")}
-                    </span>
+                    {/* Expanded description */}
+                    <AnimatePresence>
+                      {isActive && (
+                        <motion.p
+                          initial={{ height: 0, opacity: 0, marginTop: 0 }}
+                          animate={{ height: "auto", opacity: 1, marginTop: 8 }}
+                          exit={{ height: 0, opacity: 0, marginTop: 0 }}
+                          transition={{ duration: 0.2, ease: "easeOut" }}
+                          className="overflow-hidden pl-8 text-[11px] leading-[1.6] text-white/55"
+                        >
+                          {sub.description}
+                        </motion.p>
+                      )}
+                    </AnimatePresence>
                   </motion.div>
                 );
               })}
-            </motion.div>
+            </div>
           </div>
 
-          <div className="min-h-25 rounded-xl bg-white/5 p-4 transition-colors">
-            <AnimatePresence mode="wait">
-              {activeSubMuscle ? (
-                <motion.div
-                  key={activeSubMuscle.name}
-                  initial={{ opacity: 0, y: 5 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -5 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <h4 className="text-sm font-semibold text-primary">{activeSubMuscle.name}</h4>
-                  <p className="mt-2 text-xs leading-5 text-white/80">{activeSubMuscle.description}</p>
-                </motion.div>
-              ) : (
-                <motion.div
-                  key="empty-state"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  className="flex h-full items-center justify-center text-center"
-                >
-                  <p className="text-xs italic text-white/40">Hover over a node on the map above to view specific muscle details.</p>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-
-          <div className="mt-6 grid grid-cols-2 gap-4 border-t border-white/10 pt-6">
+          {/* Workouts & Tips grid — unchanged */}
+          <div className="mt-auto grid grid-cols-2 gap-4 border-t border-white/10 pt-5">
             <div>
               <h4 className="text-xs font-semibold uppercase tracking-wider text-white/60">Workouts</h4>
               <ul className="mt-3 space-y-2 text-xs text-white/70">

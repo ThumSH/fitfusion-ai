@@ -57,7 +57,7 @@ const team = [
   },
   { 
     name: "Jayavi Dias",
-    bio: "Bridging the gap between complex logic and beautiful user experiences.",
+    bio: "UG BSc (Hons) in Computer systems engineering",
     imageUrl: "/jaya.png", 
     imageFocusPosition: "50% 30%", 
     instagram: "https://www.instagram.com/jaiya_dish_?igsh=bmZrZnNuYzl3a3Q%3D&utm_source=qr",

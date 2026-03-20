@@ -1,8 +1,9 @@
 "use client";
 
 import { Canvas } from "@react-three/fiber";
-import { OrbitControls, ContactShadows } from "@react-three/drei";
-import { useRef } from "react";
+import { OrbitControls } from "@react-three/drei";
+import { memo, useRef, useMemo } from "react";
+import * as THREE from "three";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import HumanModel from "./HumanModel";
 import MuscleHotspots from "./MuscleHotspots";
@@ -11,13 +12,49 @@ import type { MuscleGroupId } from "./ideal";
 
 type BodyCanvasProps = {
   selected: MuscleGroupId | null;
-  hovered: MuscleGroupId | null;
   onHover: (group: MuscleGroupId | null) => void;
   onSelect: (group: MuscleGroupId) => void;
 };
 
-export default function BodyCanvas({ selected, hovered, onHover, onSelect }: BodyCanvasProps) {
+/* Static shadow: a simple radial gradient texture on a plane, zero per-frame cost */
+function StaticShadow() {
+  const texture = useMemo(() => {
+    const size = 256;
+    const canvas = document.createElement("canvas");
+    canvas.width = size;
+    canvas.height = size;
+    const ctx = canvas.getContext("2d")!;
+    const grad = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
+    grad.addColorStop(0, "rgba(0,0,0,0.35)");
+    grad.addColorStop(0.5, "rgba(0,0,0,0.12)");
+    grad.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, size, size);
+    return new THREE.CanvasTexture(canvas);
+  }, []);
+
+  return (
+    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.32, 0]} receiveShadow={false}>
+      <planeGeometry args={[2.5, 2.5]} />
+      <meshBasicMaterial
+        map={texture}
+        transparent
+        opacity={0.7}
+        depthWrite={false}
+      />
+    </mesh>
+  );
+}
+
+function BodyCanvas({ selected, onHover, onSelect }: BodyCanvasProps) {
   const controlsRef = useRef<OrbitControlsImpl | null>(null);
+  const isLowPowerDevice = useMemo(() => {
+    if (typeof navigator === "undefined") return false;
+    const memory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory;
+    return typeof memory === "number" ? memory <= 4 : false;
+  }, []);
+
+  const dpr: [number, number] = isLowPowerDevice ? [1, 1.2] : [1, 1.5];
 
   return (
     <div
@@ -39,18 +76,22 @@ export default function BodyCanvas({ selected, hovered, onHover, onSelect }: Bod
         <p className="text-[10px] uppercase tracking-[0.25em] text-white/20">Drag to rotate - Scroll to zoom</p>
       </div>
 
-      <Canvas camera={{ position: [0, 1.4, 3.2], fov: 32 }} gl={{ antialias: true, alpha: true }} dpr={[1, 2]}>
-        <ambientLight intensity={0.6} />
+      <Canvas
+        camera={{ position: [0, 1.4, 3.2], fov: 32 }}
+        gl={{ antialias: !isLowPowerDevice, alpha: true, powerPreference: "high-performance" }}
+        dpr={dpr}
+        performance={{ min: 0.5 }}
+      >
+        <ambientLight intensity={0.7} />
         <directionalLight position={[4, 6, 5]} intensity={2.8} color="#ffffff" />
-        <directionalLight position={[-4, 4, 2]} intensity={1.1} color="#f5f5f5" />
-        <directionalLight position={[0, 2, -4]} intensity={1.6} color="#b9ff66" />
-        <pointLight position={[0, -1.5, 1.5]} intensity={0.35} color="#b9ff66" />
+        <directionalLight position={[-3, 3, -2]} intensity={1.4} color="#f0f0f0" />
+        <directionalLight position={[0, 2, -4]} intensity={1.2} color="#b9ff66" />
 
-        <ContactShadows position={[0, -1.32, 0]} opacity={0.45} scale={3} blur={2.5} far={2} color="#000000" />
+        <StaticShadow />
 
         <HumanModel />
 
-        <MuscleHotspots selected={selected} hovered={hovered} onHover={onHover} onSelect={onSelect} />
+        <MuscleHotspots selected={selected} onHover={onHover} onSelect={onSelect} />
 
         <CameraRig selected={selected} controlsRef={controlsRef} />
 
@@ -70,3 +111,5 @@ export default function BodyCanvas({ selected, hovered, onHover, onSelect }: Bod
     </div>
   );
 }
+
+export default memo(BodyCanvas);

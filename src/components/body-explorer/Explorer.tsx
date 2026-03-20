@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback, useDeferredValue } from "react";
 import { MousePointerClick, Cpu, Dumbbell } from "lucide-react";
 import BodyCanvas from "./BodyCanvas";
 import MuscleInfoPanel from "./InfoPanel";
@@ -16,27 +16,29 @@ const groups: { id: MuscleGroupId; label: string; icon: string }[] = [
   { id: "back", label: "Back", icon: "06" },
 ];
 
-const muscleAccentColor: Record<MuscleGroupId, string> = {
-  chest: "#b9ff66",
-  shoulders: "#b9ff66",
-  arms: "#b9ff66",
-  abs: "#b9ff66",
-  legs: "#b9ff66",
-  back: "#b9ff66",
-};
+const ACCENT = "#b9ff66";
 
 export default function BodyExplorerSection() {
-  const [selected, setSelected] = useState<MuscleGroupId | null>("chest");
+  const [selected, setSelected] = useState<MuscleGroupId | null>(null);
   const [hovered, setHovered] = useState<MuscleGroupId | null>(null);
+  const deferredHovered = useDeferredValue(hovered);
 
-  const active = hovered || selected;
-  const activeColor = active ? muscleAccentColor[active] : "#b9ff66";
+  // Keep selected info stable while users orbit the model.
+  const panelTarget = selected ?? deferredHovered;
+
+  // Background glow reacts only to selected (clicks), not hover
+  // This prevents the entire section from re-rendering on every hover
+  const glowColor = selected ? ACCENT : ACCENT;
+
+  // Stable callbacks prevent BodyCanvas from re-rendering when Explorer re-renders
+  const handleHover = useCallback((id: MuscleGroupId | null) => setHovered(id), []);
+  const handleSelect = useCallback((id: MuscleGroupId) => setSelected(id), []);
 
   return (
     <section className="w-full py-24 relative overflow-hidden">
       <div
         className="pointer-events-none absolute left-1/2 top-1/2 h-225 w-225 -translate-x-1/2 -translate-y-1/2 rounded-full opacity-30 blur-[120px] transition-all duration-700 z-0"
-        style={{ background: `radial-gradient(circle, ${activeColor}18 0%, transparent 70%)` }}
+        style={{ background: `radial-gradient(circle, ${glowColor}18 0%, transparent 70%)` }}
       />
 
       <div className="relative z-10">
@@ -77,17 +79,16 @@ export default function BodyExplorerSection() {
         <div className="flex flex-wrap justify-center gap-2 mb-10">
           {groups.map(({ id, label, icon }) => {
             const isActive = selected === id;
-            const color = muscleAccentColor[id];
             return (
               <button
                 key={id}
                 onClick={() => setSelected(isActive ? null : id)}
                 className="flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-all duration-200 hover:scale-105"
                 style={{
-                  borderColor: isActive ? `${color}55` : "rgba(255,255,255,0.08)",
-                  background: isActive ? `${color}14` : "rgba(255,255,255,0.03)",
-                  color: isActive ? color : "rgba(255,255,255,0.45)",
-                  boxShadow: isActive ? `0 0 20px -4px ${color}44` : "none",
+                  borderColor: isActive ? `${ACCENT}55` : "rgba(255,255,255,0.08)",
+                  background: isActive ? `${ACCENT}14` : "rgba(255,255,255,0.03)",
+                  color: isActive ? ACCENT : "rgba(255,255,255,0.45)",
+                  boxShadow: isActive ? `0 0 20px -4px ${ACCENT}44` : "none",
                 }}
               >
                 <span style={{ fontSize: 12 }}>{icon}</span>
@@ -106,10 +107,14 @@ export default function BodyExplorerSection() {
 
         <div className="grid gap-8 lg:grid-cols-[1.5fr_1fr] items-start">
           <div className="w-full drop-shadow-2xl">
-            <BodyCanvas selected={selected} hovered={hovered} onHover={setHovered} onSelect={setSelected} />
+            <BodyCanvas
+              selected={selected}
+              onHover={handleHover}
+              onSelect={handleSelect}
+            />
           </div>
           <div className="w-full h-full">
-            <MuscleInfoPanel selected={active} />
+            <MuscleInfoPanel selected={panelTarget} />
           </div>
         </div>
       </div>

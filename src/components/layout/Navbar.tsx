@@ -106,8 +106,8 @@ export default function Navbar() {
               {link.name}
             </Link>
           ))}
-          <Link href="/meal-planner#planner" className="bg-primary text-black px-8 py-3 rounded-full font-bold text-sm w-10/12 mt-2 text-center">
-            Get Started
+          <Link href="/Why" className="bg-primary text-black px-8 py-3 rounded-full font-bold text-sm w-10/12 mt-2 text-center">
+            About Us
           </Link>
         </div>
       </div>
