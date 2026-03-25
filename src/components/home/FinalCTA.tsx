@@ -86,7 +86,7 @@ export default function FinalCTA() {
           </Link>
 
           <Link
-            href="/meal-planner#planner"
+            href="/meal-planner"
             className="group flex items-center gap-5 rounded-4xl border border-white/10 bg-white/5 p-8 transition-colors hover:border-primary/40 hover:bg-white/10"
           >
             <div className="rounded-2xl bg-primary/20 p-4 transition-transform group-hover:scale-110">

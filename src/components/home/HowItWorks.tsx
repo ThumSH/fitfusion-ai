@@ -1,24 +1,29 @@
 "use client";
 
-import { Brain, Camera, ClipboardList, Activity } from "lucide-react";
+import { Brain, Camera, ClipboardList, Activity, Dumbbell } from "lucide-react";
 import Image from "next/image";
 import SectionWrapper from "./SectionWrapper";
 
 const steps = [
   {
     icon: ClipboardList,
-    title: "Tell us your goals",
-    text: "Users provide body details, goals, and preferences so the platform can personalize the experience.",
+    title: "Set your starting point",
+    text: "Share your age, goal, gym/home setup, and weekly availability so FitFusion can build a beginner-safe base.",
   },
   {
     icon: Brain,
-    title: "AI builds the plan",
-    text: "Smart generation turns raw inputs into practical workout and meal guidance.",
+    title: "Get your beginner roadmap",
+    text: "The platform creates simple weekly training guidance with clear structure, not random exercises.",
+  },
+  {
+    icon: Dumbbell,
+    title: "Learn gym session flow",
+    text: "Follow practical steps: warm-up, main workout blocks, pacing, and recovery cues for safer progress.",
   },
   {
     icon: Camera,
-    title: "Track and improve",
-    text: "Users can analyze meals, stay aligned with nutrition, and stay consistent over time.",
+    title: "Track meals and consistency",
+    text: "Use meal tools and progress tracking to stay aligned with your goal and build habits from week one.",
   },
 ];
 
@@ -27,9 +32,9 @@ export default function HowItWorks() {
     <SectionWrapper>
       <div className="mx-auto max-w-3xl text-center">
         <p className="mb-3 text-sm uppercase tracking-[0.25em] text-primary">How it works</p>
-        <h2 className="section-title text-4xl font-bold text-white">A clean flow from goal to action</h2>
+        <h2 className="section-title text-4xl font-bold text-white">Built for beginners, step by step</h2>
         <p className="section-subtitle mt-5 text-lg text-white/65">
-          FitFusion guides the user through planning, analysis, and consistency in one connected fitness experience.
+          FitFusion helps new users start their gym journey with clear training steps, practical nutrition guidance, and a structure they can follow.
         </p>
       </div>
 

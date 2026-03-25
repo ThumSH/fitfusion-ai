@@ -2,10 +2,14 @@
 
 import { motion } from "framer-motion";
 
-export default function VideoBackground() {
+type VideoBackgroundProps = {
+  className?: string;
+};
+
+export default function VideoBackground({ className = "" }: VideoBackgroundProps) {
   return (
-    <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden bg-black">
-      {/* Video Layer — clearly visible */}
+    <div className={`pointer-events-none absolute inset-0 z-0 overflow-hidden bg-black ${className}`}>
+      {/* Video layer */}
       <video
         autoPlay
         loop

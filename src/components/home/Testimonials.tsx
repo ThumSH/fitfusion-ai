@@ -33,13 +33,13 @@ export default function Testimonials() {
 
       <div className="max-w-6xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
         {reviews.map((review, index) => (
-          <div key={index} className="bg-white/5 border border-white/10 p-8 rounded-2xl backdrop-blur-sm relative group hover:border-[#b9ff66]/50 transition-colors">
+          <div key={index} className="bg-white/5 border border-white/10 p-8 rounded-2xl backdrop-blur-sm relative group hover:border-primary/50 transition-colors">
             {/* Glowing quote mark for aesthetic */}
-            <div className="absolute top-4 right-6 text-6xl text-[#b9ff66] opacity-20 font-serif leading-none group-hover:opacity-40 transition-opacity"></div>
+            <div className="absolute top-4 right-6 text-6xl text-primary opacity-20 font-serif leading-none group-hover:opacity-40 transition-opacity"></div>
             
             <div className="flex gap-1 mb-6">
               {[...Array(review.rating)].map((_, i) => (
-                <Star key={i} size={18} className="fill-[#b9ff66] text-[#b9ff66]" />
+                <Star key={i} size={18} className="fill-primary text-primary" />
               ))}
             </div>
             
@@ -49,7 +49,7 @@ export default function Testimonials() {
             
             <div>
               <h4 className="text-white font-bold uppercase tracking-wide">{review.name}</h4>
-              <p className="text-[#b9ff66] text-sm">{review.role}</p>
+              <p className="text-primary text-sm">{review.role}</p>
             </div>
           </div>
         ))}

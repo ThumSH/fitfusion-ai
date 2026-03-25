@@ -1,8 +1,37 @@
 "use client";
 
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { motion, useInView } from "framer-motion";
-import { Brain, Apple, TrendingUp, ArrowRight, Compass } from "lucide-react";
+import {
+  Brain,
+  Apple,
+  TrendingUp,
+  ArrowRight,
+  Compass,
+} from "lucide-react";
+
+type LottieAnimation = {
+  destroy: () => void;
+};
+
+type LottieGlobal = {
+  loadAnimation: (config: {
+    container: Element;
+    renderer: "svg" | "canvas" | "html";
+    loop: boolean;
+    autoplay: boolean;
+    path: string;
+    rendererSettings?: {
+      preserveAspectRatio?: string;
+    };
+  }) => LottieAnimation;
+};
+
+declare global {
+  interface Window {
+    lottie?: LottieGlobal;
+  }
+}
 
 const STEPS = [
   {
@@ -10,9 +39,8 @@ const STEPS = [
     icon: Brain,
     title: "AI Workout Generation",
     description:
-      "Tell the AI your experience level and available equipment. It builds a science-backed split tailored to your body.",
+      "Tell FitFusion your experience level and available equipment. It builds a more structured split that matches your starting point.",
     tag: "Instant",
-    tagColor: "bg-white/10 text-white/50",
     featured: false,
   },
   {
@@ -20,9 +48,8 @@ const STEPS = [
     icon: Apple,
     title: "Smart Meal Analysis",
     description:
-      "Upload meal details and get macro calculations plus beginner-friendly prep schedules aligned to your caloric goals.",
+      "Analyze meals faster with AI-powered macro estimates and practical nutrition guidance that feels easier to follow.",
     tag: "Precision",
-    tagColor: "bg-white/10 text-white/50",
     featured: false,
   },
   {
@@ -30,9 +57,8 @@ const STEPS = [
     icon: TrendingUp,
     title: "Execute, Track, Improve",
     description:
-      "Follow your personalized routine, monitor consistency, and let FitFusion refine your approach as your strength and endurance evolve.",
+      "Stay consistent with a cleaner system for following routines, tracking momentum, and improving over time.",
     tag: "Progress",
-    tagColor: "bg-white/10 text-white/50",
     featured: false,
   },
   {
@@ -40,143 +66,205 @@ const STEPS = [
     icon: Compass,
     title: "Stay Guided Anywhere",
     description:
-      "From home workouts to gym sessions, FitFusion keeps your training, nutrition, and planning aligned so you never lose momentum.",
+      "From gym sessions to home workouts, FitFusion keeps training, meals, and planning aligned in one direction.",
     tag: "Support",
-    tagColor: "bg-[#b9ff66]/15 text-[#b9ff66]",
     featured: true,
   },
 ];
 
-function Barbell() {
+function CenterCore() {
+  const containerRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    let animation: LottieAnimation | null = null;
+    let isCancelled = false;
+
+    const bootAnimation = () => {
+      if (isCancelled || !containerRef.current || !window.lottie) return;
+
+      animation = window.lottie.loadAnimation({
+        container: containerRef.current,
+        renderer: "svg",
+        loop: true,
+        autoplay: true,
+        path: "/fitness.json",
+        rendererSettings: {
+          preserveAspectRatio: "xMidYMid meet",
+        },
+      });
+    };
+
+    if (window.lottie) {
+      bootAnimation();
+    } else {
+      const existingScript = document.querySelector<HTMLScriptElement>(
+        'script[data-lottie-loader="true"]'
+      );
+
+      if (existingScript) {
+        existingScript.addEventListener("load", bootAnimation, { once: true });
+      } else {
+        const script = document.createElement("script");
+        script.src =
+          "https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.12.2/lottie.min.js";
+        script.async = true;
+        script.dataset.lottieLoader = "true";
+        script.onload = bootAnimation;
+        document.head.appendChild(script);
+      }
+    }
+
+    return () => {
+      isCancelled = true;
+      animation?.destroy();
+    };
+  }, []);
+
   return (
     <div className="relative flex items-center justify-center">
-      <div className="absolute w-48 h-48 rounded-full bg-primary/10 blur-[60px]" />
+      <div className="absolute h-52 w-52 rounded-full bg-primary/10 blur-[70px]" />
 
-      <motion.div animate={{ y: [0, -14, 0] }} transition={{ duration: 2.8, ease: "easeInOut", repeat: Infinity }} className="relative z-10">
-        <svg width="260" height="88" viewBox="0 0 260 88" fill="none">
-          <path d="M48 44 L78 44 L98 28 L130 58 L162 28 L182 44 L212 44" stroke="#313131" strokeWidth="7" strokeLinecap="round" strokeLinejoin="round" />
-          <rect x="18" y="12" width="14" height="64" rx="5" fill="#151515" stroke="#b9ff66" strokeWidth="1.5" />
-          <rect x="4" y="22" width="11" height="44" rx="3" fill="#232323" stroke="#363636" strokeWidth="1" />
-          <rect x="228" y="12" width="14" height="64" rx="5" fill="#151515" stroke="#b9ff66" strokeWidth="1.5" />
-          <rect x="245" y="22" width="11" height="44" rx="3" fill="#232323" stroke="#363636" strokeWidth="1" />
-        </svg>
-
-        <div className="absolute -top-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1">
-          {[4, 3, 2].map((h, i) => (
-            <motion.div
-              key={i}
-              className="w-0.5 rounded-full bg-primary"
-              style={{ height: h * 4 }}
-              animate={{ opacity: [0.6, 0.15, 0.6] }}
-              transition={{ duration: 1.4, delay: i * 0.15, repeat: Infinity }}
-            />
-          ))}
-        </div>
-      </motion.div>
-
-      <motion.div
-        className="absolute w-40 h-40 rounded-full border border-primary/10"
-        animate={{ rotate: 360 }}
-        transition={{ duration: 12, ease: "linear", repeat: Infinity }}
-      >
-        <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-primary/60" />
-      </motion.div>
+      <div className="relative z-10 flex h-48 w-48 items-center justify-center rounded-[30px] border border-primary/20 bg-primary/8 p-2 backdrop-blur-xl shadow-[0_0_40px_rgba(185,255,102,0.08)] sm:h-52 sm:w-52">
+        <div className="absolute inset-2.5 rounded-[22px] border border-white/8 bg-black/30" />
+        <div
+          ref={containerRef}
+          className="relative z-10 h-full w-full"
+          aria-label="Fitness animation"
+        />
+      </div>
     </div>
   );
 }
 
-function StepCard({ step, index, active }: { step: typeof STEPS[0]; index: number; active: boolean }) {
+function StepCard({
+  step,
+  index,
+  active,
+}: {
+  step: (typeof STEPS)[0];
+  index: number;
+  active: boolean;
+}) {
   const Icon = step.icon;
+
   return (
     <motion.div
-      initial={{ opacity: 0, y: 28 }}
+      initial={{ opacity: 0, y: 24 }}
       animate={active ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.65, delay: index * 0.15, ease: [0.22, 1, 0.36, 1] }}
-      className={`group relative flex flex-col gap-6 p-8 rounded-[30px] border transition-all duration-500 cursor-default overflow-hidden ${
+      transition={{
+        duration: 0.62,
+        delay: index * 0.12,
+        ease: [0.22, 1, 0.36, 1],
+      }}
+      className={`group relative overflow-hidden rounded-[28px] border p-6 sm:p-7 transition-all duration-500 ${
         step.featured
-          ? "bg-primary/8 border-primary/25 hover:border-primary/50"
-          : "bg-white/3 border-white/8 hover:border-primary/30 hover:bg-white/6"
+          ? "border-primary/22 bg-primary/[0.07] hover:border-primary/45"
+          : "border-white/10 bg-white/[0.035] hover:border-primary/25 hover:bg-white/5.5"
       }`}
     >
-      <span className="absolute top-5 right-6 text-8xl font-black italic text-white/4 select-none leading-none pointer-events-none">{step.number}</span>
+      <div className="absolute right-5 top-4 pointer-events-none text-[64px] font-semibold tracking-[-0.06em] text-white/4 sm:text-[78px]">
+        {step.number}
+      </div>
 
-      <div className="flex items-start justify-between">
-        <div
-          className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-300 ${
-            step.featured ? "bg-primary/15 group-hover:bg-primary/25" : "bg-white/6 group-hover:bg-primary/12"
-          }`}
-        >
-          <Icon size={22} className="text-primary" />
+      <div className="relative z-10 flex flex-col gap-5">
+        <div className="flex items-start justify-between gap-4">
+          <div
+            className={`flex h-12 w-12 items-center justify-center rounded-2xl transition-all duration-300 ${
+              step.featured
+                ? "bg-primary/14 group-hover:bg-primary/22"
+                : "bg-white/6 group-hover:bg-primary/12"
+            }`}
+          >
+            <Icon size={20} className="text-primary" />
+          </div>
+
+          <span
+            className={`rounded-full border px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.22em] ${
+              step.featured
+                ? "border-primary/20 bg-primary/12 text-primary"
+                : "border-white/10 bg-white/6 text-white/50"
+            }`}
+          >
+            {step.tag}
+          </span>
         </div>
-        <span className={`text-[10px] font-black uppercase tracking-[0.22em] px-3 py-1.5 rounded-full border border-white/10 ${step.tagColor}`}>{step.tag}</span>
+
+        <div>
+          <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-white/32">
+            Step {step.number}
+          </p>
+          <h3 className="max-w-[18ch] text-xl font-semibold leading-tight tracking-[-0.03em] text-white sm:text-2xl">
+            {step.title}
+          </h3>
+        </div>
+
+        <p className="text-sm leading-7 text-white/60 sm:text-[15px]">
+          {step.description}
+        </p>
+
+        <motion.div
+          className="h-[1.5px] rounded-full bg-primary/80"
+          initial={{ scaleX: 0 }}
+          animate={active ? { scaleX: 1 } : {}}
+          transition={{
+            delay: 0.5 + index * 0.12,
+            duration: 0.45,
+            ease: "easeOut",
+          }}
+          style={{ transformOrigin: "left" }}
+        />
       </div>
-
-      <div>
-        <p className="text-[11px] font-black uppercase tracking-[0.2em] text-white/30 mb-2">Step {step.number}</p>
-        <h3 className="text-2xl md:text-[28px] font-black italic uppercase text-white leading-tight tracking-tight">{step.title}</h3>
-      </div>
-
-      <p className="text-base text-white/58 leading-relaxed font-medium">{step.description}</p>
-
-      <motion.div
-        className="absolute bottom-0 left-8 right-8 h-[1.5px] rounded-full bg-primary"
-        initial={{ scaleX: 0 }}
-        animate={active ? { scaleX: 1 } : {}}
-        transition={{ delay: 0.6 + index * 0.15, duration: 0.5, ease: "easeOut" }}
-        style={{ transformOrigin: "left" }}
-      />
     </motion.div>
   );
 }
 
 export default function UsageShowcase() {
-  const ref = useRef<HTMLDivElement>(null);
+  const ref = useRef<HTMLElement | null>(null);
   const isInView = useInView(ref, { once: true, margin: "-80px" });
 
   return (
-    <section ref={ref} className="w-full py-28 relative overflow-hidden bg-black">
-      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-175 h-75 bg-primary/4 blur-[120px] pointer-events-none" />
+    <section
+      id="usage-showcase"
+      ref={ref}
+      className="relative w-full overflow-hidden bg-black py-24 sm:py-28"
+    >
+      <div className="pointer-events-none absolute left-1/2 top-[32%] h-56 w-2xl -translate-x-1/2 rounded-full bg-primary/5 blur-[120px]" />
 
-      <div className="relative z-10 max-w-6xl mx-auto px-6 flex flex-col gap-16">
+      <div className="container-shell relative z-10 flex flex-col gap-14 sm:gap-16">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 18 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-          className="flex flex-col items-center text-center gap-5"
+          transition={{ duration: 0.58, ease: [0.22, 1, 0.36, 1] }}
+          className="mx-auto flex max-w-3xl flex-col items-center gap-5 text-center"
         >
-          <div className="flex items-center gap-2 bg-primary/10 border border-primary/20 rounded-full px-4 py-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-            <span className="text-[10px] font-black uppercase tracking-[0.25em] text-primary">How It Works</span>
+          <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-4 py-1.5">
+            <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+            <span className="text-[10px] font-semibold uppercase tracking-[0.24em] text-primary">
+              How It Works
+            </span>
           </div>
 
-          <h2 className="text-5xl md:text-6xl font-black italic uppercase tracking-tighter leading-[0.9] text-white">
-            Master Your{" "}
-            <span className="relative inline-block">
-              <span className="text-primary">Routine.</span>
-              <motion.span
-                className="absolute -bottom-1 left-0 h-0.5 bg-primary rounded-full"
-                initial={{ scaleX: 0 }}
-                animate={isInView ? { scaleX: 1 } : {}}
-                transition={{ delay: 0.5, duration: 0.55, ease: "easeOut" }}
-                style={{ transformOrigin: "left" }}
-              />
-            </span>
+          <h2 className="text-4xl font-semibold leading-[0.95] tracking-[-0.05em] text-white sm:text-5xl lg:text-6xl">
+            A clearer path from
+            <span className="text-gradient"> planning to progress</span>.
           </h2>
 
-          <p className="text-lg md:text-xl text-white/55 font-medium leading-relaxed max-w-3xl">
-            FitFusion is your all-in-one AI fitness system. We help you generate personalized workouts, build practical meal plans, analyze nutrition from meals, and stay consistent whether you train at home or at the gym.
+          <p className="max-w-2xl text-sm leading-7 text-white/62 sm:text-base">
+            FitFusion brings workouts, meal guidance, nutrition analysis, and
+            consistency tracking into one cleaner system so users can move with
+            more confidence.
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr] gap-6 lg:gap-8 items-start">
+        <div className="grid items-start gap-6 lg:grid-cols-[1fr_auto_1fr] lg:gap-8">
           <div className="flex flex-col gap-5">
             {STEPS.slice(0, 2).map((step, i) => (
               <div key={step.number} className="flex flex-col gap-4">
                 <StepCard step={step} index={i} active={isInView} />
                 {i < 1 && (
                   <div className="flex items-center gap-2 px-2">
-                    <div className="flex-1 h-px bg-white/8" />
-                    <ArrowRight size={12} className="text-white/15" />
+                    <div className="h-px flex-1 bg-white/8" />
+                    <ArrowRight size={12} className="text-white/18" />
                   </div>
                 )}
               </div>
@@ -184,12 +272,16 @@ export default function UsageShowcase() {
           </div>
 
           <motion.div
-            initial={{ opacity: 0, scale: 0.85 }}
+            initial={{ opacity: 0, scale: 0.88 }}
             animate={isInView ? { opacity: 1, scale: 1 } : {}}
-            transition={{ delay: 0.3, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-            className="flex items-center justify-center lg:py-10 lg:px-4 min-h-50"
+            transition={{
+              delay: 0.25,
+              duration: 0.65,
+              ease: [0.22, 1, 0.36, 1],
+            }}
+            className="flex min-h-45 items-center justify-center px-2 py-2 lg:min-h-130 lg:px-4"
           >
-            <Barbell />
+            <CenterCore />
           </motion.div>
 
           <div className="flex flex-col gap-5">
@@ -198,8 +290,8 @@ export default function UsageShowcase() {
                 <StepCard step={step} index={i + 2} active={isInView} />
                 {i < 1 && (
                   <div className="flex items-center gap-2 px-2">
-                    <div className="flex-1 h-px bg-white/8" />
-                    <ArrowRight size={12} className="text-white/15" />
+                    <div className="h-px flex-1 bg-white/8" />
+                    <ArrowRight size={12} className="text-white/18" />
                   </div>
                 )}
               </div>
@@ -210,33 +302,45 @@ export default function UsageShowcase() {
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ delay: 0.55, duration: 0.55 }}
-          className="grid grid-cols-1 sm:grid-cols-3 gap-3"
+          transition={{ delay: 0.48, duration: 0.52 }}
+          className="grid gap-3 sm:grid-cols-3"
         >
           {[
-            { val: "4", label: "Complete AI Steps" },
-            { val: "Workout + Meal", label: "Unified Planning" },
-            { val: "Home To Gym", label: "Adaptive Guidance" },
+            { val: "4", label: "Core AI Steps" },
+            { val: "Workout + Meal", label: "Unified Flow" },
+            { val: "Home To Gym", label: "Flexible Guidance" },
           ].map((m) => (
-            <div key={m.label} className="flex flex-col items-center text-center gap-1 py-5 rounded-2xl bg-white/3 border border-white/8">
-              <span className="text-2xl font-black italic text-primary tracking-tighter">{m.val}</span>
-              <span className="text-[10px] font-black uppercase tracking-widest text-white/35">{m.label}</span>
+            <div
+              key={m.label}
+              className="rounded-2xl border border-white/8 bg-white/[0.035] px-4 py-5 text-center"
+            >
+              <div className="text-2xl font-semibold tracking-[-0.05em] text-primary">
+                {m.val}
+              </div>
+              <div className="mt-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-white/35">
+                {m.label}
+              </div>
             </div>
           ))}
         </motion.div>
 
         <motion.div
-          initial={{ opacity: 0, y: 16 }}
+          initial={{ opacity: 0, y: 14 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ delay: 0.6, duration: 0.55 }}
-          className="flex flex-col sm:flex-row items-center justify-between gap-6 py-7 px-8 rounded-[28px] bg-white/3 border border-white/8"
+          transition={{ delay: 0.56, duration: 0.52 }}
+          className="flex flex-col items-center justify-between gap-5 rounded-[28px] border border-white/8 bg-white/[0.035] px-6 py-6 sm:flex-row sm:px-8"
         >
-          <p className="text-base font-bold italic text-white/50 text-center sm:text-left max-w-md">
-            Join <span className="text-white/80">50,000+ users</span> using FitFusion to train smarter, eat better, and stay consistent with AI support.
+          <p className="max-w-xl text-center text-sm leading-7 text-white/58 sm:text-left sm:text-[15px]">
+            Join users building smarter routines, better nutrition habits, and
+            stronger consistency with FitFusion’s AI-guided system.
           </p>
-          <button className="shrink-0 bg-primary text-black font-black uppercase italic tracking-widest text-sm px-8 py-4 rounded-2xl hover:shadow-[0_0_30px_-5px_rgba(185,255,102,0.5)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-300">
+
+          <a
+            href="/gym-finder"
+            className="shrink-0 rounded-2xl bg-primary px-6 py-3.5 text-sm font-semibold text-black transition duration-300 hover:brightness-110"
+          >
             Build My Plan
-          </button>
+          </a>
         </motion.div>
       </div>
     </section>

@@ -21,7 +21,7 @@ export default function Navbar() {
   const navLinks = [
     { name: "Home", href: "/" },
     { name: "Workout Planner", href: "/workout-planner" },
-    { name: "Meal Planner", href: "/meal-planner#planner" },
+    { name: "Meal Planner", href: "/meal-planner" },
     { name: "Gym Finder", href: "/gym-finder" },
   ];
 

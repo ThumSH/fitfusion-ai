@@ -1,6 +1,10 @@
-export default function VideoBackground() {
+type VideoBackgroundProps = {
+  className?: string;
+};
+
+export default function VideoBackground({ className = "" }: VideoBackgroundProps) {
   return (
-    <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden bg-background">
+    <div className={`pointer-events-none absolute inset-0 z-0 overflow-hidden bg-background ${className}`}>
       <video
         autoPlay
         loop
