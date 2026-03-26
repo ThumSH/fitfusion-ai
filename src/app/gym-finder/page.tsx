@@ -32,12 +32,24 @@ let googleMapsScriptPromise: Promise<void> | null = null;
 const FALLBACK_CENTER = { lat: 6.9271, lng: 79.8612 }; // Colombo
 
 const neonMapStyles = [
-  { elementType: "geometry", stylers: [{ color: "#060606" }] },
-  { elementType: "labels.text.fill", stylers: [{ color: "#f5f5f5" }] },
-  { featureType: "road", elementType: "geometry", stylers: [{ color: "#141414" }] },
-  { featureType: "water", elementType: "geometry", stylers: [{ color: "#0a0a0a" }] },
-  { featureType: "poi.business", stylers: [{ visibility: "on" }] },
-  { featureType: "poi.park", elementType: "geometry", stylers: [{ color: "#121a0c" }] },
+  { elementType: "geometry", stylers: [{ color: "#080b10" }] },
+  { elementType: "labels.text.fill", stylers: [{ color: "#96a0ac" }] },
+  { elementType: "labels.text.stroke", stylers: [{ color: "#05070b" }, { weight: 2 }] },
+  { elementType: "labels.icon", stylers: [{ saturation: -60 }, { lightness: -20 }] },
+  { featureType: "administrative.locality", elementType: "labels.text.fill", stylers: [{ color: "#a8b1bc" }] },
+  { featureType: "landscape", elementType: "geometry", stylers: [{ color: "#0a0d13" }] },
+  { featureType: "road", elementType: "geometry", stylers: [{ color: "#151b24" }] },
+  { featureType: "road", elementType: "geometry.stroke", stylers: [{ color: "#0d1219" }] },
+  { featureType: "road", elementType: "labels.text.fill", stylers: [{ color: "#8792a0" }] },
+  { featureType: "road.highway", elementType: "geometry", stylers: [{ color: "#1a2432" }] },
+  { featureType: "road.highway", elementType: "geometry.stroke", stylers: [{ color: "#111925" }] },
+  { featureType: "road.highway", elementType: "labels.text.fill", stylers: [{ color: "#93a0ad" }] },
+  { featureType: "poi", elementType: "labels.text.fill", stylers: [{ color: "#7e8894" }] },
+  { featureType: "poi.business", stylers: [{ visibility: "off" }] },
+  { featureType: "transit", elementType: "labels.text.fill", stylers: [{ color: "#747f8b" }] },
+  { featureType: "water", elementType: "geometry", stylers: [{ color: "#081321" }] },
+  { featureType: "water", elementType: "labels.text.fill", stylers: [{ color: "#627386" }] },
+  { featureType: "poi.park", elementType: "geometry", stylers: [{ color: "#111a14" }] },
 ];
 
 type GymPlace = {

@@ -111,7 +111,7 @@ export default function HeroSection() {
   return (
     <section
       ref={sectionRef}
-      className="relative isolate min-h-svh overflow-hidden bg-black"
+      className="relative isolate min-h-svh overflow-x-hidden bg-black"
     >
       {/* Right-side video zone */}
       <div className="absolute inset-y-0 right-0 w-full lg:w-[58%] -z-20">
@@ -138,7 +138,7 @@ export default function HeroSection() {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(185,255,102,0.06),transparent_24%),radial-gradient(circle_at_bottom_left,rgba(185,255,102,0.04),transparent_22%)]" />
       </div>
 
-      <div className="container-shell relative z-10 flex min-h-svh items-center py-4 sm:py-6 lg:py-6">
+      <div className="container-shell relative z-10 flex min-h-svh items-start pt-24 pb-6 sm:items-center sm:py-6 lg:py-6">
         <div className="w-full lg:max-w-150">
           <div className="flex flex-col items-start">
             <motion.div
@@ -152,7 +152,7 @@ export default function HeroSection() {
             </motion.div>
 
             {/* Animated heading area */}
-            <div className="relative mt-4 w-full max-w-2xl min-h-45 sm:min-h-50 lg:min-h-53.75">
+            <div className="relative mt-3 w-full max-w-2xl min-h-32 sm:mt-4 sm:min-h-50 lg:min-h-53.75">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={activeSlide}
@@ -166,7 +166,7 @@ export default function HeroSection() {
                     {currentSlide.eyebrow}
                   </p>
 
-                  <h1 className="max-w-2xl text-3xl font-semibold leading-[0.98] tracking-[-0.05em] text-white sm:text-4xl lg:text-[3.45rem]">
+                  <h1 className="max-w-2xl text-[2.1rem] font-semibold leading-[0.98] tracking-[-0.05em] text-white sm:text-4xl lg:text-[3.45rem]">
                     {currentSlide.headingPrefix}
                     <span className="text-gradient">{currentSlide.headingAccent}</span>
                     {currentSlide.headingSuffix}
@@ -179,16 +179,6 @@ export default function HeroSection() {
               </AnimatePresence>
             </div>
 
-            <motion.p
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.52, delay: 0.14, ease: [0.22, 1, 0.36, 1] }}
-              className="mt-2 max-w-xl text-sm leading-6 text-white/68 sm:text-[15px]"
-            >
-              FitFusion was designed for first-time gym users. It teaches what to do before workouts,
-              how to train step-by-step, and how to stay consistent from week one.
-            </motion.p>
-
             {/* Product highlights synced with main heading slide */}
             <motion.div
               initial={{ opacity: 0, y: 24 }}
@@ -198,7 +188,7 @@ export default function HeroSection() {
                 delay: 0.2,
                 ease: [0.22, 1, 0.36, 1],
               }}
-              className="w-full max-w-140 rounded-[28px] border border-white/10 bg-white/5 p-4 sm:p-5 backdrop-blur-xl shadow-[0_18px_80px_rgba(0,0,0,0.28)]"
+              className="w-full max-w-140 rounded-3xl border border-white/10 bg-white/5 p-4 sm:rounded-[28px] sm:p-5 backdrop-blur-xl shadow-[0_18px_80px_rgba(0,0,0,0.28)]"
             >
               <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-white/40">
@@ -223,7 +213,7 @@ export default function HeroSection() {
                 </div>
               </div>
 
-              <div className="relative min-h-50 sm:min-h-53.75">
+              <div className="relative min-h-42 sm:min-h-53.75">
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={`details-${activeSlide}`}
@@ -231,10 +221,10 @@ export default function HeroSection() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.32, ease: "easeOut" }}
-                    className="absolute inset-0 space-y-4"
+                    className="absolute inset-0 space-y-3 sm:space-y-4"
                   >
                     <div className="flex items-start gap-4">
-                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary/12 text-primary">
+                      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-primary/12 text-primary sm:h-12 sm:w-12">
                         <CurrentIcon size={20} />
                       </div>
 
@@ -242,13 +232,13 @@ export default function HeroSection() {
                         <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-primary/82">
                           {currentSlide.eyebrow}
                         </p>
-                        <h3 className="mt-2 text-lg font-semibold leading-tight text-white sm:text-xl">
+                        <h3 className="mt-1.5 text-[1.65rem] font-semibold leading-tight text-white sm:mt-2 sm:text-xl">
                           {currentSlide.detailTitle}
                         </h3>
                       </div>
                     </div>
 
-                    <p className="max-w-xl text-sm leading-6 text-white/64 sm:text-[15px]">
+                    <p className="max-w-xl text-[15px] leading-7 text-white/64 sm:text-[15px] sm:leading-6">
                       {currentSlide.detailBody}
                     </p>
 
@@ -281,11 +271,11 @@ export default function HeroSection() {
                 delay: 0.28,
                 ease: [0.22, 1, 0.36, 1],
               }}
-              className="mt-6 flex w-full flex-col gap-4 sm:w-auto sm:flex-row"
+              className="mt-4 flex w-full flex-col gap-3 sm:mt-6 sm:w-auto sm:flex-row sm:gap-4"
             >
               <a
                 href="/gym-finder"
-                className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-6 py-3.5 text-sm font-semibold text-black transition duration-300 hover:brightness-110"
+                className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-black transition duration-300 hover:brightness-110 sm:py-3.5"
               >
                 Build My Plan
                 <ArrowRight size={16} />
@@ -293,7 +283,7 @@ export default function HeroSection() {
 
               <a
                 href="#usage-showcase"
-                className="inline-flex items-center justify-center gap-2 rounded-full border border-white/12 bg-white/6 px-6 py-3.5 text-sm font-semibold text-white/88 backdrop-blur-md transition duration-300 hover:bg-white/10 hover:text-white"
+                className="inline-flex items-center justify-center gap-2 rounded-full border border-white/12 bg-white/6 px-6 py-3 text-sm font-semibold text-white/88 backdrop-blur-md transition duration-300 hover:bg-white/10 hover:text-white sm:py-3.5"
               >
                 <Play size={15} />
                 See How It Works

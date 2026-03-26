@@ -40,10 +40,10 @@ export default function VideoBackground({ className = "" }: VideoBackgroundProps
           muted
           playsInline
           preload="metadata"
-          poster="/gym-hero.jpg"
+          poster="/gym-ready.webm"
           className="absolute inset-0 z-0 h-full w-full object-cover opacity-55"
         >
-          <source src="/find.webm" type="video/webm" />
+          <source src="/gym-ready.webm" type="video/webm" />
         </video>
       )}
 
