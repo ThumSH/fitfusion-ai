@@ -260,7 +260,7 @@ export default function WorkoutEvidenceCharts({
     <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
       <div className="rounded-2xl border border-white/12 bg-black/35 p-5 backdrop-blur-xl">
         <p className="mb-3 text-xs font-bold uppercase tracking-[0.18em] text-primary">Dose-Response Curve</p>
-        <div className="h-[19rem]">
+        <div className="h-76">
           <Line data={stepsDoseResponseData} options={lineOptions} />
         </div>
         <div className="mt-3 space-y-1.5">
@@ -275,7 +275,7 @@ export default function WorkoutEvidenceCharts({
 
       <div className="rounded-2xl border border-white/12 bg-black/35 p-5 backdrop-blur-xl">
         <p className="mb-3 text-xs font-bold uppercase tracking-[0.18em] text-primary">Domain Comparison (Grouped)</p>
-        <div className="h-[19rem]">
+        <div className="h-76">
           <Bar data={groupedBarData} options={groupedBarOptions} />
         </div>
         <div className="mt-3 space-y-1.5">
@@ -289,7 +289,7 @@ export default function WorkoutEvidenceCharts({
 
       <div className="rounded-2xl border border-white/12 bg-black/35 p-5 backdrop-blur-xl">
         <p className="mb-3 text-xs font-bold uppercase tracking-[0.18em] text-primary">Impact Wheel (Polar)</p>
-        <div className="h-[19rem]">
+        <div className="h-76">
           <PolarArea data={polarData} options={polarOptions} />
         </div>
         <div className="mt-3 space-y-1.5">
@@ -301,7 +301,7 @@ export default function WorkoutEvidenceCharts({
 
       <div className="rounded-2xl border border-white/12 bg-black/35 p-5 backdrop-blur-xl">
         <p className="mb-3 text-xs font-bold uppercase tracking-[0.18em] text-primary">Intervention Bubble Map</p>
-        <div className="h-[19rem]">
+        <div className="h-76">
           <Bubble data={interventionBubbleData} options={bubbleOptions} />
         </div>
         <div className="mt-3 space-y-1.5">

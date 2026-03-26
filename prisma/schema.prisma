@@ -1,0 +1,34 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model WorkoutHistory {
+  id           String   @id @default(cuid())
+  clerkUserId  String
+  formData     Json
+  generatedPlan String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([clerkUserId, createdAt(sort: Desc)])
+}
+
+model MealHistory {
+  id            String   @id @default(cuid())
+  clerkUserId   String
+  age           Int?
+  weightKg      Float?
+  goal          String?
+  preferences   String?
+  inputData     Json
+  generatedPlan String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([clerkUserId, createdAt(sort: Desc)])
+}
+

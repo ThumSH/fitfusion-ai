@@ -103,7 +103,7 @@ const benefits: BenefitCard[] = [
       "Better blood sugar control and metabolic efficiency.",
       "Higher aerobic capacity and day-to-day energy.",
     ],
-    image: "/best.webp",
+    image: "/ph-health.webp",
   },
   {
     icon: Brain,
@@ -125,7 +125,7 @@ const benefits: BenefitCard[] = [
       "Improves sleep pressure and recovery hormone profile.",
       "Faster tissue repair and better next-session readiness.",
     ],
-    image: "/thum.png",
+    image: "/sleep-rec.webp",
   },
   {
     icon: Footprints,
@@ -136,7 +136,7 @@ const benefits: BenefitCard[] = [
       "Supports bone, joint, and posture resilience.",
       "Reduces injury risk and preserves functional independence.",
     ],
-    image: "/legs.jpg",
+    image: "/long.webp",
   },
 ];
 
@@ -155,7 +155,7 @@ const phases: PhaseCard[] = [
       "Do not skip warm-up and jump straight into heavy reps.",
       "Do not test max loads without setup and support.",
     ],
-    image: "/shoulder.png",
+    image: "/water.webp",
   },
   {
     icon: Zap,
@@ -171,7 +171,7 @@ const phases: PhaseCard[] = [
       "Do not chase failure on every set.",
       "Do not compromise form to lift heavier.",
     ],
-    image: "/chest.png",
+    image: "/work.webp",
   },
   {
     icon: GlassWater,
@@ -187,17 +187,17 @@ const phases: PhaseCard[] = [
       "Do not stay sedentary immediately after hard sessions.",
       "Do not ignore pain that exceeds normal soreness.",
     ],
-    image: "/back.png",
+    image: "/after.webp",
   },
 ];
 
 const focusZones: FocusCard[] = [
-  { title: "Chest Focus", image: "/chest.png", blurb: "Push mechanics, pressing angles, controlled tempo." },
-  { title: "Back Focus", image: "/back.png", blurb: "Scapular control, pull strength, posture support." },
-  { title: "Shoulder Focus", image: "/shoulder.png", blurb: "Stable overhead range and joint-friendly loading." },
-  { title: "Arm Focus", image: "/arm.png", blurb: "Biceps/triceps detail work after heavy compounds." },
-  { title: "Core Focus", image: "/abs.png", blurb: "Bracing, anti-rotation, and movement transfer." },
-  { title: "Leg Focus", image: "/legs.jpg", blurb: "Squat/hinge patterns for power and durability." },
+  { title: "Chest Focus", image: "/download.webp", blurb: "Push mechanics, pressing angles, controlled tempo." },
+  { title: "Back Focus", image: "/row.webp", blurb: "Scapular control, pull strength, posture support." },
+  { title: "Shoulder Focus", image: "/shoulder.webp", blurb: "Stable overhead range and joint-friendly loading." },
+  { title: "Arm Focus", image: "/arm.webp", blurb: "Biceps/triceps detail work after heavy compounds." },
+  { title: "Core Focus", image: "/core.webp", blurb: "Bracing, anti-rotation, and movement transfer." },
+  { title: "Leg Focus", image: "/leg.webp", blurb: "Squat/hinge patterns for power and durability." },
 ];
 
 const mentalEvidenceMetrics: WorkoutEvidenceMetric[] = [

@@ -1,75 +1,200 @@
-// src/app/api/meal-plan/route.ts
-
+import { auth } from "@clerk/nextjs/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import type { MealHistoryInput } from "@/types/meal-history";
+
+export const runtime = "nodejs";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
+function buildPrompt(input: Required<MealHistoryInput>) {
+  return `
+You are an expert sports nutritionist and AI gym coach.
+Create a detailed, structured 1-day sample meal plan and a general nutritional strategy for:
+- Age: ${input.age}
+- Weight: ${input.weight} kg
+- Primary Goal: ${input.goal.replace("_", " ")}
+- Dietary Preferences/Allergies: ${input.preferences || "None"}
+
+Please provide:
+1. Target macros: estimated daily calories and macro breakdown (protein, carbs, fats)
+2. Meal timetable: practical 1-day schedule with at least 5 eating slots and food quantities
+3. Supplementation: protein intake advice + creatine protocol
+4. A compact shopping list for the day
+
+Rules:
+- Do not return only generic advice.
+- Include explicit meal-by-meal entries (breakfast/lunch/etc) with grams or household measures.
+- Keep output concise but concrete.
+
+Format in clean markdown with headers, bullets, and practical clarity.
+`;
+}
+
+function buildFallbackPlan() {
+  return `
+> Notice: Live AI servers are currently under high traffic. A fallback plan is generated so you can keep progressing.
+
+### Target Macros
+- Calories: ~2,600 kcal
+- Protein: 160g-180g
+- Carbohydrates: 280g
+- Fats: 75g
+
+### Meal Timetable
+- Breakfast (8:00 AM): eggs, whole-grain toast, berries
+- Lunch (1:00 PM): grilled chicken, quinoa, broccoli
+- Pre-workout (4:30 PM): banana + almonds
+- Post-workout (6:30 PM): whey isolate in water
+- Dinner (8:00 PM): salmon, sweet potato, asparagus
+
+### Supplementation Protocol
+- Creatine monohydrate: 5g daily, every day
+- Protein powder: ~25g post-workout to help hit daily target
+`;
+}
+
+function hasStructuredMealPlan(text: string) {
+  const lower = text.toLowerCase();
+  const hasMealMarkers =
+    lower.includes("breakfast") ||
+    lower.includes("lunch") ||
+    lower.includes("dinner") ||
+    lower.includes("pre-workout") ||
+    lower.includes("post-workout");
+  const hasMacros = lower.includes("protein") && (lower.includes("carb") || lower.includes("fat"));
+  return hasMealMarkers && hasMacros;
+}
+
+function buildStructuredMealAppendix(input: Required<MealHistoryInput>) {
+  const goalText = input.goal.replaceAll("_", " ");
+  const weightNum = Number.parseFloat(input.weight);
+  const proteinTarget = Number.isFinite(weightNum)
+    ? `${Math.round(weightNum * 1.8)}-${Math.round(weightNum * 2.2)} g`
+    : "160-190 g";
+
+  const caloriesByGoal: Record<string, string> = {
+    lean_bulk: "2,500-2,900 kcal",
+    dirty_bulk: "2,900-3,300 kcal",
+    cut: "1,900-2,300 kcal",
+    maintenance: "2,200-2,700 kcal",
+  };
+
+  const calories = caloriesByGoal[input.goal] ?? "2,300-2,700 kcal";
+
+  return `
+## Structured Daily Plan (Auto-completed)
+- Goal: ${goalText}
+- Calories: ${calories}
+- Protein target: ${proteinTarget}
+- Dietary preferences: ${input.preferences || "None"}
+
+### Meal Timetable
+- Breakfast (8:00): oats (80 g), whey (1 scoop), banana (1), peanut butter (1 tbsp)
+- Snack (11:00): greek yogurt (200 g), berries (100 g), almonds (15 g)
+- Lunch (13:30): chicken breast (180 g), rice (220 g cooked), mixed vegetables (150 g), olive oil (1 tsp)
+- Pre-workout (16:30): toast (2 slices), eggs (2 whole + 2 whites), fruit (1 serving)
+- Post-workout (18:30): whey (1 scoop) + creatine monohydrate (5 g) + water
+- Dinner (20:30): fish or lean meat (180 g), potatoes (250 g), salad (large bowl)
+
+### Supplement Protocol
+- Creatine monohydrate: 3-5 g daily, same time each day.
+- Protein powder: use 20-35 g servings only when whole-food protein is short.
+- Hydration: 30-40 ml/kg/day, increase in hot climate or high sweat sessions.
+
+### Shopping List (1 Day)
+- Protein: chicken/fish/eggs, greek yogurt, whey protein
+- Carbs: oats, rice, potatoes, fruit, bread
+- Fats: olive oil, nuts, peanut butter
+- Micronutrients: mixed vegetables, leafy greens, berries
+`;
+}
+
+async function persistMealHistory(userId: string | null, input: Required<MealHistoryInput>, generatedPlan: string) {
+  if (!userId) return;
+
+  const ageNum = Number.parseInt(input.age, 10);
+  const weightNum = Number.parseFloat(input.weight);
+
+  try {
+    await prisma.mealHistory.create({
+      data: {
+        clerkUserId: userId,
+        age: Number.isFinite(ageNum) ? ageNum : null,
+        weightKg: Number.isFinite(weightNum) ? weightNum : null,
+        goal: input.goal || null,
+        preferences: input.preferences || null,
+        inputData: input,
+        generatedPlan,
+      },
+    });
+  } catch (error) {
+    // Plan generation should still succeed even if history save fails.
+    console.error("Meal history save error:", error);
+  }
+}
+
 export async function POST(req: Request) {
+  let generatedPlan = "";
+  let input: Required<MealHistoryInput> = {
+    age: "",
+    weight: "",
+    goal: "",
+    preferences: "",
+  };
+
   try {
     const body = await req.json();
-    const { age, weight, goal, preferences } = body;
+    input = {
+      age: String(body.age ?? "").trim(),
+      weight: String(body.weight ?? "").trim(),
+      goal: String(body.goal ?? "").trim(),
+      preferences: String(body.preferences ?? "").trim(),
+    };
 
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-
-    const prompt = `
-      You are an expert sports nutritionist and AI gym coach. 
-      Create a detailed, structured 1-day sample meal plan and a general nutritional strategy for:
-      - Age: ${age}
-      - Weight: ${weight} kg
-      - Primary Goal: ${goal.replace('_', ' ')}
-      - Dietary Preferences/Allergies: ${preferences || "None"}
-      
-      Please provide the following:
-      1. **Target Macros:** Estimated daily calories and macro breakdown (Protein, Carbs, Fats) to hit their goal.
-      2. **Meal Timetable:** A realistic 1-day meal schedule.
-      3. **Supplementation:** Specific protein intake advice and a proper creatine supplementation protocol.
-      
-      Format the entire response in clean, readable Markdown using bolding, lists, and headers.
-    `;
-
-    // Try to get the real AI response
-    const result = await model.generateContent(prompt);
-    const text = result.response.text();
-
-    return NextResponse.json({ plan: text });
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } catch (error: any) {
-    console.error("AI Error encountered:", error.message);
-
-    // HACKATHON FAIL-SAFE: If the API is busy (503) or fails, return a high-quality mock plan!
-    if (error.status === 503 || error.message.includes("503") || error.message.includes("fetch failed")) {
-      const mockPlan = `
-> ⚠️ **Notice:** The Live AI servers are currently experiencing high traffic. We have generated this standard fallback plan based on your general profile so you can keep moving forward!
-
-### 📊 Target Macros
-To support your goals at your current body weight, aim for the following daily targets:
-* **Calories:** ~2,600 kcal
-* **Protein:** 160g - 180g (Crucial for muscle repair)
-* **Carbohydrates:** 280g (Primary energy source)
-* **Fats:** 75g (Hormone regulation)
-
-### 🕒 Meal Timetable
-* **Breakfast (8:00 AM):** 4 whole eggs scrambled, 2 slices of whole-grain toast, and 1 cup of mixed berries.
-* **Lunch (1:00 PM):** 200g grilled chicken breast, 1 cup of cooked quinoa, and a large serving of roasted broccoli.
-* **Pre-Workout (4:30 PM):** 1 medium banana and a handful of almonds.
-* **Post-Workout (6:30 PM):** 1 scoop of whey protein isolate in water.
-* **Dinner (8:00 PM):** 200g baked salmon, 1 medium sweet potato, and asparagus cooked in olive oil.
-
-### 💊 Supplementation Protocol
-* **Creatine Monohydrate:** Take **5g daily**. You do not need a loading phase. Take it consistently every day (rest days included), ideally post-workout with your protein shake for better absorption.
-* **Protein Powder:** Use 1 scoop (approx 25g protein) immediately after your workout to hit your daily macro goals efficiently.
-      `;
-      
-      // Return the mock plan so the UI still looks awesome
-      return NextResponse.json({ plan: mockPlan });
+    if (!input.age || !input.weight || !input.goal) {
+      return NextResponse.json(
+        { error: "Missing required fields: age, weight, goal." },
+        { status: 400 }
+      );
     }
 
-    // If it's a completely different error (like a bad API key), show the real error
-    return NextResponse.json(
-      { error: "Failed to generate meal plan. Please check your API key and try again." },
-      { status: 500 }
-    );
+    const model = genAI.getGenerativeModel({ model: process.env.GEMINI_MODEL || "gemini-2.5-flash" });
+    const result = await model.generateContent(buildPrompt(input));
+    generatedPlan = result.response.text().trim();
+
+    if (!generatedPlan) {
+      return NextResponse.json({ error: "Meal plan generation returned empty output." }, { status: 502 });
+    }
+
+    if (!hasStructuredMealPlan(generatedPlan)) {
+      generatedPlan = `${generatedPlan}\n\n${buildStructuredMealAppendix(input)}`.trim();
+    }
+  } catch (error: unknown) {
+    const err = error as { status?: number; message?: string };
+    const message = err.message ?? "";
+    const isHighTrafficFallback =
+      err.status === 503 || message.includes("503") || message.toLowerCase().includes("fetch failed");
+
+    if (isHighTrafficFallback) {
+      generatedPlan = buildFallbackPlan();
+    } else {
+      console.error("Meal plan generation error:", error);
+      return NextResponse.json(
+        { error: "Failed to generate meal plan. Please check API key/model and try again." },
+        { status: 500 }
+      );
+    }
   }
+
+  try {
+    const { userId } = await auth();
+    await persistMealHistory(userId ?? null, input, generatedPlan);
+  } catch (authOrSaveError) {
+    // Keep generation response successful even if auth/history write fails.
+    console.error("Meal auth/history pipeline warning:", authOrSaveError);
+  }
+
+  return NextResponse.json({ plan: generatedPlan });
 }

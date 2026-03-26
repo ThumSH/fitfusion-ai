@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
@@ -31,7 +32,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <ClerkProvider>
+      <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} min-h-screen bg-background text-(--color-foreground) antialiased flex flex-col`}
       >
@@ -42,6 +44,7 @@ export default function RootLayout({
 
         <Footer />
       </body>
-    </html>
+      </html>
+    </ClerkProvider>
   );
 }

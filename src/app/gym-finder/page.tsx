@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
@@ -43,6 +44,7 @@ type GymPlace = {
   name: string;
   vicinity?: string;
   rating?: number;
+  businessStatus?: string;
   simulatedPrice: number;
   geometry?: {
     location?: {
@@ -118,13 +120,15 @@ function loadGoogleMapsScript() {
 
 export default function GymFinderPage() {
   const mapRef = useRef<HTMLDivElement>(null);
+  const finderSectionRef = useRef<HTMLElement>(null);
   const mapInstanceRef = useRef<any>(null);
   const userMarkerRef = useRef<any>(null);
   const gymMarkersRef = useRef<any[]>([]);
 
   const [gyms, setGyms] = useState<GymPlace[]>([]);
-  const [status, setStatus] = useState("Initializing map...");
+  const [status, setStatus] = useState("Map will initialize when the finder section is visible.");
   const [mapError, setMapError] = useState<string | null>(null);
+  const [shouldInitMap, setShouldInitMap] = useState(false);
 
   const highlights = [
     {
@@ -233,7 +237,28 @@ export default function GymFinderPage() {
   ];
 
   useEffect(() => {
+    const target = finderSectionRef.current;
+    if (!target) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const [entry] = entries;
+        if (entry?.isIntersecting) {
+          setShouldInitMap(true);
+          observer.disconnect();
+        }
+      },
+      { root: null, rootMargin: "200px 0px", threshold: 0.1 }
+    );
+
+    observer.observe(target);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!shouldInitMap) return;
     let isUnmounted = false;
+    setStatus("Initializing map...");
 
     const clearGymMarkers = () => {
       gymMarkersRef.current.forEach((marker) => marker.setMap(null));
@@ -256,10 +281,16 @@ export default function GymFinderPage() {
           clearGymMarkers();
 
           if (searchStatus === "OK" && results) {
-            const gymsWithPrices: GymPlace[] = results.map((gym) => ({
-              ...gym,
-              simulatedPrice: Math.floor(Math.random() * (18000 - 5000 + 1) + 5000),
-            }));
+            const gymsWithPrices: GymPlace[] = results
+              .filter((gym) => gym?.business_status !== "CLOSED_PERMANENTLY")
+              .map((gym) => ({
+                name: gym.name,
+                vicinity: gym.vicinity,
+                rating: typeof gym.rating === "number" ? gym.rating : undefined,
+                businessStatus: gym.business_status,
+                geometry: gym.geometry,
+                simulatedPrice: Math.floor(Math.random() * (18000 - 5000 + 1) + 5000),
+              }));
 
             setGyms(gymsWithPrices);
             setStatus("");
@@ -355,7 +386,7 @@ export default function GymFinderPage() {
       isUnmounted = true;
       delete (window as any).gm_authFailure;
     };
-  }, []);
+  }, [shouldInitMap]);
 
   const renderStars = (rating?: number) => {
     if (!rating) return null;
@@ -502,7 +533,7 @@ export default function GymFinderPage() {
           </div>
         </section>
 
-        <section id="finder-sections" className="relative z-10 bg-black py-16 sm:py-20">
+        <section id="finder-sections" ref={finderSectionRef} className="relative z-10 bg-black py-16 sm:py-20">
           <div className="pointer-events-none absolute left-1/2 top-4 z-0 h-80 w-80 -translate-x-1/2 rounded-full bg-primary/10 blur-[120px]" />
 
           <div className="container-shell relative z-10 px-4 sm:px-6">

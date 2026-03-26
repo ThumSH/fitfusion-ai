@@ -33,6 +33,61 @@ function toNumber(value: unknown) {
   return num;
 }
 
+function hasStructuredWorkoutPlan(text: string) {
+  return /\bday\s*\d+\b/i.test(text) && /\bsets?\b|\breps?\b|\bwarm[\s-]?up\b/i.test(text);
+}
+
+function buildFallbackWorkoutMarkdown(input: {
+  environment: string;
+  days: number;
+  duration: number;
+  goal: string;
+  experience: string;
+}) {
+  const isHome = input.environment.toLowerCase() === "home";
+  const isBeginner = input.experience.toLowerCase().includes("beginner");
+  const isStrength = input.goal.toLowerCase().includes("strength");
+  const exerciseCount = input.duration <= 20 ? 3 : input.duration <= 30 ? 4 : input.duration <= 45 ? 5 : 6;
+  const scheme = isStrength ? (isBeginner ? "3 x 8 reps" : "4 x 5 reps") : isBeginner ? "3 x 10 reps" : "4 x 8-12 reps";
+  const rest = isStrength ? "120s rest" : "90s rest";
+
+  const db = isHome
+    ? {
+        warmup: ["Jumping Jacks - 1 min", "Arm Circles - 1 min", "Bodyweight Squats - 1 min"],
+        push: ["Incline Push-ups", "Chair Dips", "Pike Push-ups", "Arm Circles", "Diamond Push-ups", "Plank to Down Dog"],
+        pull: ["Door Frame Rows", "Superman Holds", "Reverse Snow Angels", "Towel Pull-ins", "Bird-Dog", "Prone Swimmers"],
+        legs: ["Lunges", "Glute Bridges", "Wall Sit", "Calf Raises", "Sumo Squats", "Jump Squats"],
+      }
+    : {
+        warmup: ["Treadmill / Bike - 5 mins", "Dynamic Arm Swings - 1 min", "Bodyweight Lunges - 1 min"],
+        push: ["Bench Press", "Dumbbell Flyes", "Overhead Press", "Tricep Extensions", "Lateral Raises", "Push-ups"],
+        pull: ["Deadlifts", "Barbell Rows", "Lat Pulldowns", "Face Pulls", "Hammer Curls", "Back Extensions"],
+        legs: ["Barbell Squats", "Romanian Deadlifts", "Leg Press", "Walking Lunges", "Calf Raises", "Hip Thrusts"],
+      };
+
+  const blocks: string[] = [];
+  blocks.push("## Structured Weekly Plan (Auto-completed)");
+  blocks.push(`- Environment: ${isHome ? "Home" : "Gym"}`);
+  blocks.push(`- Session length: ${input.duration} minutes`);
+  blocks.push(`- Frequency: ${input.days} days/week`);
+  blocks.push("");
+
+  for (let day = 1; day <= input.days; day += 1) {
+    const rotation = (day - 1) % 3;
+    const focus = rotation === 0 ? "Push Focus" : rotation === 1 ? "Pull Focus" : "Legs & Core";
+    const exercises = (rotation === 0 ? db.push : rotation === 1 ? db.pull : db.legs).slice(0, exerciseCount);
+    blocks.push(`### Day ${day} - ${focus}`);
+    blocks.push(`- Warm-up: ${db.warmup.join(", ")}`);
+    for (const exercise of exercises) {
+      blocks.push(`- ${exercise}: ${scheme}, ${rest}`);
+    }
+    blocks.push("- Cool-down: 5 minutes light stretching and breathing.");
+    blocks.push("");
+  }
+
+  return blocks.join("\n");
+}
+
 export async function POST(request: NextRequest) {
   try {
     if (!ai) {
@@ -155,6 +210,17 @@ Format with markdown headings, short bullet points, and concise tables where use
         { error: "Gemini returned an empty workout plan. Please try again." },
         { status: 502 }
       );
+    }
+
+    if (!hasStructuredWorkoutPlan(text)) {
+      const fallback = buildFallbackWorkoutMarkdown({
+        environment,
+        days: daysNum,
+        duration: durationNum,
+        goal,
+        experience,
+      });
+      text = `${text}\n\n${fallback}`.trim();
     }
 
     return NextResponse.json({ plan: text });

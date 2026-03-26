@@ -1,9 +1,10 @@
 ﻿/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import ReactMarkdown from "react-markdown";
+import { useAuth } from "@clerk/nextjs";
 import {
   Loader2,
   Clock,
@@ -16,19 +17,12 @@ import {
   AlertCircle,
   ClipboardCheck,
   ClipboardCopy,
+  Save,
+  History,
 } from "lucide-react";
+import type { WorkoutFormPayload, WorkoutHistoryItem } from "@/types/workout-history";
 
-type WorkoutForm = {
-  age: string;
-  weight: string;
-  height: string;
-  goal: string;
-  experience: string;
-  daysPerWeek: string;
-  workoutDuration: string;
-  environment: "home" | "gym";
-  notes: string;
-};
+type WorkoutForm = WorkoutFormPayload;
 
 type WorkoutExercise = {
   name: string;
@@ -77,6 +71,16 @@ type Particle = {
 
 type WorkoutApiResponse = {
   plan?: string;
+  error?: string;
+};
+
+type WorkoutHistoryResponse = {
+  items?: WorkoutHistoryItem[];
+  error?: string;
+};
+
+type SaveWorkoutHistoryResponse = {
+  item?: WorkoutHistoryItem;
   error?: string;
 };
 
@@ -297,15 +301,89 @@ function ParticleBackground() {
 }
 
 export default function WorkoutPlanPanel({ compact = false }: { compact?: boolean }) {
+  const { isLoaded: isAuthLoaded, userId } = useAuth();
   const [isGenerating, setIsGenerating] = useState(false);
   const [showResult, setShowResult] = useState(false);
   const [apiPlan, setApiPlan] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [isSavingPlan, setIsSavingPlan] = useState(false);
+  const [saveMessage, setSaveMessage] = useState<string | null>(null);
+  const [historyItems, setHistoryItems] = useState<WorkoutHistoryItem[]>([]);
+  const [isHistoryLoading, setIsHistoryLoading] = useState(false);
+  const [historyError, setHistoryError] = useState<string | null>(null);
 
   const [formData, setFormData] = useState<WorkoutForm>(DEFAULT_FORM);
 
   const previewPlan = useMemo(() => buildPreviewPlan(formData), [formData]);
+
+  const loadHistory = useCallback(async () => {
+    if (!userId) return;
+    setIsHistoryLoading(true);
+    setHistoryError(null);
+    try {
+      const response = await fetch("/api/workout-history?limit=8");
+      const data = (await response.json()) as WorkoutHistoryResponse;
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to load history.");
+      }
+      setHistoryItems(data.items ?? []);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Failed to load history.";
+      setHistoryError(message);
+    } finally {
+      setIsHistoryLoading(false);
+    }
+  }, [userId]);
+
+  const saveCurrentPlan = useCallback(async () => {
+    if (!userId || !apiPlan) return;
+    setIsSavingPlan(true);
+    setSaveMessage(null);
+    try {
+      const response = await fetch("/api/workout-history", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          generatedPlan: apiPlan,
+          formData,
+        }),
+      });
+      const data = (await response.json()) as SaveWorkoutHistoryResponse;
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to save plan.");
+      }
+      setSaveMessage("Plan saved to your account.");
+      await loadHistory();
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Failed to save plan.";
+      setSaveMessage(message);
+    } finally {
+      setIsSavingPlan(false);
+    }
+  }, [apiPlan, formData, loadHistory, userId]);
+
+  const loadHistoryItemIntoView = (item: WorkoutHistoryItem) => {
+    setFormData(item.formData);
+    setApiPlan(item.generatedPlan);
+    setShowResult(true);
+    setError(null);
+    setCopied(false);
+    setSaveMessage(null);
+    setTimeout(() => {
+      document.getElementById("workout-result")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 120);
+  };
+
+  useEffect(() => {
+    if (!isAuthLoaded) return;
+    if (!userId) {
+      setHistoryItems([]);
+      setHistoryError(null);
+      return;
+    }
+    void loadHistory();
+  }, [isAuthLoaded, loadHistory, userId]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -314,6 +392,7 @@ export default function WorkoutPlanPanel({ compact = false }: { compact?: boolea
     setApiPlan(null);
     setError(null);
     setCopied(false);
+    setSaveMessage(null);
 
     try {
       const response = await fetch("/api/workout-plan", {
@@ -579,139 +658,265 @@ export default function WorkoutPlanPanel({ compact = false }: { compact?: boolea
                 </div>
               )}
 
-              <div className="space-y-20">
-                {previewPlan.map((session, sIdx) => (
-                  <motion.div
-                    key={session.day}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ delay: sIdx * 0.08 }}
-                    viewport={{ once: true }}
-                    className="group relative"
-                  >
-                    <div className="absolute top-0 -left-4 hidden h-full w-1 bg-white/5 transition-colors group-hover:bg-[#ccff00]/30 md:-left-12 md:block" />
+              <div className="grid grid-cols-1 items-start gap-8 xl:grid-cols-2">
+                <div className="space-y-8">
+                  <div className="rounded-2xl border border-white/10 bg-white/2 p-4">
+                    <p className="text-[11px] font-semibold tracking-[0.15em] text-[#ccff00]/90 uppercase">Preview Schedule</p>
+                    <p className="mt-1 text-sm text-white/65">
+                      Your quick visual split by day. Detailed Gemini programming appears in the panel on the right.
+                    </p>
+                  </div>
 
-                    <div className="flex flex-col gap-8 md:flex-row">
-                      <div className="space-y-4 md:w-1/4">
-                        <div className="w-fit -skew-x-12 bg-[#ccff00] px-4 py-1 text-sm font-black italic text-black">
-                          DAY {String(session.day).padStart(2, "0")}
-                        </div>
-                        <h4 className="text-3xl leading-tight font-black italic uppercase text-white">{session.title}</h4>
-                        <div className="flex items-center gap-2 text-[10px] font-bold tracking-widest text-zinc-500 uppercase">
-                          <Clock className="h-3 w-3" /> {formData.workoutDuration} Minute Session
-                        </div>
-                        <div className="rounded-xl border border-white/5 bg-white/5 p-3">
-                          <p className="text-[11px] leading-relaxed italic text-zinc-400">{session.note}</p>
-                        </div>
-                      </div>
+                  <div className="space-y-8 xl:max-h-300 xl:overflow-y-auto xl:pr-2">
+                    {previewPlan.map((session, sIdx) => (
+                      <motion.div
+                        key={session.day}
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        transition={{ delay: sIdx * 0.08 }}
+                        viewport={{ once: true }}
+                        className="group relative"
+                      >
+                        <div className="absolute top-0 -left-4 hidden h-full w-1 bg-white/5 transition-colors group-hover:bg-[#ccff00]/30 md:-left-8 md:block" />
 
-                      <div className="relative overflow-hidden rounded-4xl border border-white/5 bg-[#0d0d0d] p-6 shadow-2xl transition-all group-hover:border-[#ccff00]/20 md:w-3/4 md:p-8">
-                        <div className="mb-8 flex items-center gap-4 rounded-2xl border border-white/5 bg-white/3 p-4">
-                          <div className="rounded-lg bg-orange-500/20 p-2">
-                            <Flame className="h-5 w-5 text-orange-500" />
+                        <div className="flex flex-col gap-8 lg:flex-row">
+                          <div className="space-y-4 lg:w-[34%]">
+                            <div className="w-fit -skew-x-12 bg-[#ccff00] px-4 py-1 text-sm font-black italic text-black">
+                              DAY {String(session.day).padStart(2, "0")}
+                            </div>
+                            <h4 className="text-3xl leading-tight font-black italic uppercase text-white">{session.title}</h4>
+                            <div className="flex items-center gap-2 text-[10px] font-bold tracking-widest text-zinc-500 uppercase">
+                              <Clock className="h-3 w-3" /> {formData.workoutDuration} Minute Session
+                            </div>
+                            <div className="rounded-xl border border-white/5 bg-white/5 p-3">
+                              <p className="text-[11px] leading-relaxed italic text-zinc-400">{session.note}</p>
+                            </div>
                           </div>
-                          <div>
-                            <h5 className="text-xs font-black tracking-widest text-white uppercase">Warmup</h5>
-                            <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1">
-                              {session.warmup.map((w, wIdx) => (
-                                <span key={wIdx} className="text-[11px] font-medium text-zinc-500">
-                                  • {w}
-                                </span>
+
+                          <div className="relative overflow-hidden rounded-4xl border border-white/5 bg-[#0d0d0d] p-6 shadow-2xl transition-all group-hover:border-[#ccff00]/20 lg:w-[66%] lg:p-8">
+                            <div className="mb-8 flex items-center gap-4 rounded-2xl border border-white/5 bg-white/3 p-4">
+                              <div className="rounded-lg bg-orange-500/20 p-2">
+                                <Flame className="h-5 w-5 text-orange-500" />
+                              </div>
+                              <div>
+                                <h5 className="text-xs font-black tracking-widest text-white uppercase">Warmup</h5>
+                                <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1">
+                                  {session.warmup.map((w, wIdx) => (
+                                    <span key={wIdx} className="text-[11px] font-medium text-zinc-500">
+                                      • {w}
+                                    </span>
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="space-y-4">
+                              {session.exercises.map((ex, idx) => (
+                                <motion.div
+                                  key={`${ex.name}-${idx}`}
+                                  whileHover={{ scale: 1.01 }}
+                                  className="group/item relative flex items-center justify-between rounded-2xl border border-white/5 bg-linear-to-r from-white/1 to-transparent p-5 transition-all hover:border-[#ccff00]/40"
+                                >
+                                  <div className="flex items-center gap-6">
+                                    <div className="text-4xl font-black italic text-[#ccff00]/20 transition-colors group-hover/item:text-[#ccff00]/80">
+                                      {idx + 1}
+                                    </div>
+                                    <div>
+                                      <h6 className="text-lg font-bold text-white transition-colors group-hover/item:text-[#ccff00]">{ex.name}</h6>
+                                      <div className="mt-1 flex items-center gap-3">
+                                        <span className="flex items-center gap-1 text-[10px] font-bold tracking-wide text-zinc-500 uppercase">
+                                          <Dumbbell className="h-3 w-3" /> {ex.reps}
+                                        </span>
+                                        <span className="h-1 w-1 rounded-full bg-zinc-800" />
+                                        <span className="flex items-center gap-1 text-[10px] font-bold tracking-wide text-zinc-500 uppercase">
+                                          <Timer className="h-3 w-3" /> {ex.rest}
+                                        </span>
+                                      </div>
+                                    </div>
+                                  </div>
+
+                                  <div className="hidden opacity-0 transition-opacity group-hover/item:opacity-100 sm:block">
+                                    <Zap className="h-5 w-5 fill-[#ccff00] text-[#ccff00]" />
+                                  </div>
+
+                                  <div
+                                    className="absolute bottom-0 left-0 h-0.5 bg-[#ccff00] opacity-0 transition-all group-hover/item:opacity-100"
+                                    style={{ width: `${(idx + 1) * (100 / session.exercises.length)}%` }}
+                                  />
+                                </motion.div>
                               ))}
                             </div>
                           </div>
                         </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
 
-                        <div className="space-y-4">
-                          {session.exercises.map((ex, idx) => (
-                            <motion.div
-                              key={`${ex.name}-${idx}`}
-                              whileHover={{ scale: 1.01 }}
-                              className="group/item relative flex items-center justify-between rounded-2xl border border-white/5 bg-linear-to-r from-white/1 to-transparent p-5 transition-all hover:border-[#ccff00]/40"
+                <div className="min-w-0">
+                  {apiPlan ? (
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="rounded-4xl border border-[#ccff00]/25 bg-black/50 p-6 backdrop-blur-xl md:p-8"
+                    >
+                      <div className="mb-6 flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-4">
+                        <h4 className="flex items-center gap-2 text-xl font-black tracking-wide text-[#ccff00] uppercase">
+                          <Activity size={20} />
+                          Gemini Detailed Plan
+                        </h4>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={copyPlan}
+                            className="inline-flex items-center gap-1.5 rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-xs font-semibold tracking-wider text-white/80 uppercase transition-colors hover:border-[#ccff00]/40 hover:text-[#ccff00]"
+                          >
+                            {copied ? <ClipboardCheck size={14} /> : <ClipboardCopy size={14} />}
+                            {copied ? "Copied" : "Copy"}
+                          </button>
+
+                          {isAuthLoaded && userId && (
+                            <button
+                              type="button"
+                              onClick={saveCurrentPlan}
+                              disabled={isSavingPlan}
+                              className="inline-flex items-center gap-1.5 rounded-xl border border-[#ccff00]/35 bg-[#ccff00]/10 px-3 py-2 text-xs font-semibold tracking-wider text-[#ddf6bf] uppercase transition-colors hover:border-[#ccff00]/55 hover:text-[#f4ffd8] disabled:cursor-not-allowed disabled:opacity-60"
                             >
-                              <div className="flex items-center gap-6">
-                                <div className="text-4xl font-black italic text-[#ccff00]/20 transition-colors group-hover/item:text-[#ccff00]/80">
-                                  {idx + 1}
-                                </div>
-                                <div>
-                                  <h6 className="text-lg font-bold text-white transition-colors group-hover/item:text-[#ccff00]">{ex.name}</h6>
-                                  <div className="mt-1 flex items-center gap-3">
-                                    <span className="flex items-center gap-1 text-[10px] font-bold tracking-wide text-zinc-500 uppercase">
-                                      <Dumbbell className="h-3 w-3" /> {ex.reps}
-                                    </span>
-                                    <span className="h-1 w-1 rounded-full bg-zinc-800" />
-                                    <span className="flex items-center gap-1 text-[10px] font-bold tracking-wide text-zinc-500 uppercase">
-                                      <Timer className="h-3 w-3" /> {ex.rest}
-                                    </span>
-                                  </div>
-                                </div>
-                              </div>
-
-                              <div className="hidden opacity-0 transition-opacity group-hover/item:opacity-100 sm:block">
-                                <Zap className="h-5 w-5 fill-[#ccff00] text-[#ccff00]" />
-                              </div>
-
-                              <div
-                                className="absolute bottom-0 left-0 h-0.5 bg-[#ccff00] opacity-0 transition-all group-hover/item:opacity-100"
-                                style={{ width: `${(idx + 1) * (100 / session.exercises.length)}%` }}
-                              />
-                            </motion.div>
-                          ))}
+                              {isSavingPlan ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
+                              {isSavingPlan ? "Saving" : "Save Plan"}
+                            </button>
+                          )}
                         </div>
                       </div>
+
+                      {!userId && isAuthLoaded && (
+                        <p className="mb-4 text-xs font-medium text-white/55">
+                          Sign in to save this plan to your account and load it later.
+                        </p>
+                      )}
+
+                      {saveMessage && (
+                        <div className="mb-4 rounded-xl border border-[#ccff00]/25 bg-[#ccff00]/8 px-3 py-2 text-xs font-semibold text-[#ddf6bf]">
+                          {saveMessage}
+                        </div>
+                      )}
+
+                      <ReactMarkdown
+                        components={{
+                          h1: (props) => (
+                            <h1 className="mb-4 mt-8 text-3xl font-black tracking-wide text-white uppercase" {...props} />
+                          ),
+                          h2: (props) => (
+                            <h2 className="mb-4 mt-8 text-xl font-bold tracking-wider text-[#ccff00] uppercase" {...props} />
+                          ),
+                          h3: (props) => <h3 className="mb-3 mt-6 text-lg font-semibold text-white/90" {...props} />,
+                          p: (props) => <p className="mb-4 text-sm leading-relaxed text-white/75" {...props} />,
+                          ul: (props) => (
+                            <ul className="mb-6 ml-6 list-disc space-y-2 text-sm marker:text-[#ccff00]" {...props} />
+                          ),
+                          ol: (props) => (
+                            <ol className="mb-6 ml-6 list-decimal space-y-2 text-sm marker:text-[#ccff00]" {...props} />
+                          ),
+                          li: (props) => <li className="pl-1 text-white/75" {...props} />,
+                          table: (props) => (
+                            <div className="mb-6 overflow-x-auto rounded-xl border border-white/10">
+                              <table className="min-w-full border-collapse text-sm text-white/80" {...props} />
+                            </div>
+                          ),
+                          thead: (props) => <thead className="bg-white/5" {...props} />,
+                          th: (props) => (
+                            <th className="border border-white/10 px-3 py-2 text-left text-xs font-bold uppercase tracking-wider text-[#ccff00]" {...props} />
+                          ),
+                          td: (props) => <td className="border border-white/10 px-3 py-2 align-top" {...props} />,
+                          code: (props) => (
+                            <code className="wrap-break-word rounded bg-white/10 px-1.5 py-0.5 text-xs text-[#dff8be]" {...props} />
+                          ),
+                          strong: (props) => (
+                            <strong
+                              className="rounded border border-[#ccff00]/25 bg-[#ccff00]/10 px-1.5 py-0.5 font-semibold text-white"
+                              {...props}
+                            />
+                          ),
+                        }}
+                      >
+                        {apiPlan}
+                      </ReactMarkdown>
+                    </motion.div>
+                  ) : (
+                    <div className="rounded-3xl border border-white/10 bg-black/35 p-6 backdrop-blur-xl">
+                      <p className="text-[11px] font-semibold tracking-[0.14em] text-[#ccff00]/90 uppercase">
+                        Gemini Output
+                      </p>
+                      <p className="mt-2 text-sm leading-relaxed text-white/65">
+                        Generate a plan to see the AI detailed breakdown, progress notes, and coaching instructions here.
+                      </p>
                     </div>
-                  </motion.div>
-                ))}
+                  )}
+                </div>
               </div>
 
-              {apiPlan && (
+              {userId && (
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="rounded-4xl border border-[#ccff00]/25 bg-black/50 p-6 backdrop-blur-xl md:p-8"
+                  className="rounded-3xl border border-white/10 bg-black/40 p-5 backdrop-blur-xl md:p-6"
                 >
-                  <div className="mb-6 flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-4">
-                    <h4 className="flex items-center gap-2 text-xl font-black tracking-wide text-[#ccff00] uppercase">
-                      <Activity size={20} />
-                      Gemini Detailed Plan
+                  <div className="mb-4 flex items-center justify-between gap-3">
+                    <h4 className="flex items-center gap-2 text-lg font-black uppercase tracking-wide text-white">
+                      <History size={18} className="text-primary" />
+                      My Saved Workout Plans
                     </h4>
                     <button
                       type="button"
-                      onClick={copyPlan}
-                      className="inline-flex items-center gap-1.5 rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-xs font-semibold tracking-wider text-white/80 uppercase transition-colors hover:border-[#ccff00]/40 hover:text-[#ccff00]"
+                      onClick={loadHistory}
+                      className="rounded-lg border border-white/20 bg-white/5 px-3 py-1.5 text-[11px] font-semibold tracking-[0.12em] text-white/75 uppercase transition-colors hover:border-primary/30 hover:text-primary"
                     >
-                      {copied ? <ClipboardCheck size={14} /> : <ClipboardCopy size={14} />}
-                      {copied ? "Copied" : "Copy"}
+                      Refresh
                     </button>
                   </div>
 
-                  <ReactMarkdown
-                    components={{
-                      h1: (props) => (
-                        <h1 className="mb-4 mt-8 text-3xl font-black tracking-wide text-white uppercase" {...props} />
-                      ),
-                      h2: (props) => (
-                        <h2 className="mb-4 mt-8 text-xl font-bold tracking-wider text-[#ccff00] uppercase" {...props} />
-                      ),
-                      h3: (props) => <h3 className="mb-3 mt-6 text-lg font-semibold text-white/90" {...props} />,
-                      p: (props) => <p className="mb-4 text-sm leading-relaxed text-white/75" {...props} />,
-                      ul: (props) => (
-                        <ul className="mb-6 ml-6 list-disc space-y-2 text-sm marker:text-[#ccff00]" {...props} />
-                      ),
-                      ol: (props) => (
-                        <ol className="mb-6 ml-6 list-decimal space-y-2 text-sm marker:text-[#ccff00]" {...props} />
-                      ),
-                      li: (props) => <li className="pl-1 text-white/75" {...props} />,
-                      strong: (props) => (
-                        <strong
-                          className="rounded border border-[#ccff00]/25 bg-[#ccff00]/10 px-1.5 py-0.5 font-semibold text-white"
-                          {...props}
-                        />
-                      ),
-                    }}
-                  >
-                    {apiPlan}
-                  </ReactMarkdown>
+                  {isHistoryLoading && (
+                    <p className="flex items-center gap-2 text-sm text-white/65">
+                      <Loader2 size={14} className="animate-spin text-primary" />
+                      Loading saved plans...
+                    </p>
+                  )}
+
+                  {historyError && !isHistoryLoading && (
+                    <p className="text-sm text-red-200">{historyError}</p>
+                  )}
+
+                  {!isHistoryLoading && !historyError && historyItems.length === 0 && (
+                    <p className="text-sm text-white/60">No saved plans yet. Save your current plan to start your history.</p>
+                  )}
+
+                  {!isHistoryLoading && historyItems.length > 0 && (
+                    <div className="space-y-3">
+                      {historyItems.map((item) => (
+                        <div
+                          key={item.id}
+                          className="flex flex-col gap-3 rounded-2xl border border-white/10 bg-white/2 p-4 sm:flex-row sm:items-center sm:justify-between"
+                        >
+                          <div>
+                            <p className="text-xs font-bold uppercase tracking-[0.16em] text-primary/85">
+                              {item.formData.goal}
+                            </p>
+                            <p className="mt-1 text-xs text-white/65">
+                              {new Date(item.createdAt).toLocaleString()} | {item.formData.environment.toUpperCase()} |{" "}
+                              {item.formData.workoutDuration} min | {item.formData.daysPerWeek} days/week
+                            </p>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => loadHistoryItemIntoView(item)}
+                            className="rounded-xl border border-primary/30 bg-primary/10 px-4 py-2 text-xs font-bold uppercase tracking-[0.15em] text-[#ddf6bf] transition-colors hover:border-primary/50 hover:bg-primary/15"
+                          >
+                            Load
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </motion.div>
               )}
 

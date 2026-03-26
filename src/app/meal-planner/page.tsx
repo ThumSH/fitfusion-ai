@@ -2,8 +2,9 @@
 
 import type { ComponentType } from "react";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import { useAuth } from "@clerk/nextjs";
 import {
   Activity,
   AlertCircle,
@@ -27,6 +28,7 @@ import AnimatedSection from "@/components/layout/AnimatedSection";
 import VideoBackground from "./VideoBackground";
 import MealImageAnalyzerPanel from "@/components/meal/MealImageAnalyzerPanel";
 import NutritionEvidenceCharts from "@/components/meal/NutritionEvidenceCharts";
+import type { MealHistoryItem } from "@/types/meal-history";
 
 type Tool = "planner" | "analyzer";
 type IconType = ComponentType<{ className?: string; size?: number }>;
@@ -56,6 +58,7 @@ type SupplementCard = {
   timing: string;
   purpose: string;
   caution: string;
+  image: string;
 };
 
 type ShakeCard = {
@@ -88,6 +91,18 @@ type StudyCard = {
   link: string;
 };
 
+type MealPlannerForm = {
+  age: string;
+  weight: string;
+  goal: string;
+  preferences: string;
+};
+
+type MealHistoryResponse = {
+  items?: MealHistoryItem[];
+  error?: string;
+};
+
 const highlights = [
   {
     icon: ShieldCheck,
@@ -114,7 +129,7 @@ const goalModes: GoalMode[] = [
     carbs: "3-5 g/kg",
     fat: "0.6-0.9 g/kg",
     summary: "Controlled surplus for muscle gain with minimal fat accumulation.",
-    image: "/shoulder.png",
+    image: "/lean.webp",
   },
   {
     mode: "Aggressive Bulk",
@@ -123,7 +138,7 @@ const goalModes: GoalMode[] = [
     carbs: "4-6 g/kg",
     fat: "0.7-1.0 g/kg",
     summary: "Faster mass gain when training volume is high and recovery is strong.",
-    image: "/chest.png",
+    image: "/aggressive.webp",
   },
   {
     mode: "Cutting",
@@ -132,7 +147,7 @@ const goalModes: GoalMode[] = [
     carbs: "2-4 g/kg",
     fat: "0.6-0.8 g/kg",
     summary: "Fat loss while preserving lean mass through high protein intake.",
-    image: "/abs.png",
+    image: "/cut.webp",
   },
   {
     mode: "Maintenance / Recomp",
@@ -141,7 +156,7 @@ const goalModes: GoalMode[] = [
     carbs: "2.5-4 g/kg",
     fat: "0.7-0.9 g/kg",
     summary: "Body recomposition by keeping calories stable and training progressive.",
-    image: "/back.png",
+    image: "/mr.webp",
   },
 ];
 
@@ -151,21 +166,21 @@ const proteinGuides: ProteinGuide[] = [
     range: "1.6-1.8 g/kg / day",
     split: "3-4 meals, 25-40 g each",
     note: "Prioritize consistency and whole-food protein before advanced stacking.",
-    image: "/arm.png",
+    image: "/b-lifter.webp",
   },
   {
     title: "Intermediate / Advanced",
     range: "1.8-2.2 g/kg / day",
     split: "4-5 feedings, 30-45 g each",
     note: "Higher training load benefits from tighter protein distribution.",
-    image: "/legs.jpg",
+    image: "/ad-lifter.webp",
   },
   {
     title: "During Cutting",
     range: "2.0-2.4 g/kg / day",
     split: "4-5 feedings, include pre-sleep",
     note: "Helps retain muscle in calorie deficit with hard training.",
-    image: "/abs.png",
+    image: "/c-phase.webp",
   },
 ];
 
@@ -177,6 +192,7 @@ const supplementStack: SupplementCard[] = [
     timing: "Post-workout or as a protein gap filler",
     purpose: "Fast protein delivery to hit your daily target.",
     caution: "Check lactose tolerance and total calorie budget.",
+    image: "/q.webp",
   },
   {
     icon: Pill,
@@ -185,6 +201,7 @@ const supplementStack: SupplementCard[] = [
     timing: "Any time, consistently every day",
     purpose: "Supports strength output, repeat performance, and lean mass.",
     caution: "Hydrate properly and avoid megadosing.",
+    image: "/w.webp",
   },
   {
     icon: Beef,
@@ -193,6 +210,7 @@ const supplementStack: SupplementCard[] = [
     timing: "Night or long no-meal gaps",
     purpose: "Supports amino acid availability during longer fasting windows.",
     caution: "Use when whole-food protein intake is low.",
+    image: "/a.webp",
   },
   {
     icon: Droplets,
@@ -201,6 +219,7 @@ const supplementStack: SupplementCard[] = [
     timing: "Pre and intra workout",
     purpose: "Improves performance stability and recovery quality.",
     caution: "Watch sodium if medically restricted.",
+    image: "/e.webp",
   },
 ];
 
@@ -226,15 +245,6 @@ const shakes: ShakeCard[] = [
     focus: "Adds calories without heavy digestive load.",
     image: "/legs.jpg",
   },
-];
-
-const nutritionZones = [
-  { title: "Chest / Push Days", image: "/chest.png", note: "Higher carbs can improve pressing output." },
-  { title: "Back / Pull Days", image: "/back.png", note: "Protein distribution supports pulling volume." },
-  { title: "Leg Days", image: "/legs.jpg", note: "Big sessions often need strongest carb allocation." },
-  { title: "Core Focus", image: "/abs.png", note: "Cutting phases benefit from protein-dense timing." },
-  { title: "Shoulder Focus", image: "/shoulder.png", note: "Hydration supports overhead work quality." },
-  { title: "Arm Focus", image: "/arm.png", note: "Use shakes to close protein gaps." },
 ];
 
 const creatineEvidenceBars: EvidenceBar[] = [
@@ -302,10 +312,20 @@ const recentStudies: StudyCard[] = [
 ];
 
 export default function MealPlannerPage() {
+  const { isLoaded: isAuthLoaded, userId } = useAuth();
   const [loading, setLoading] = useState(false);
   const [mealPlan, setMealPlan] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [activeTool, setActiveTool] = useState<Tool>("planner");
+  const [formState, setFormState] = useState<MealPlannerForm>({
+    age: "",
+    weight: "",
+    goal: "",
+    preferences: "",
+  });
+  const [historyItems, setHistoryItems] = useState<MealHistoryItem[]>([]);
+  const [isHistoryLoading, setIsHistoryLoading] = useState(false);
+  const [historyError, setHistoryError] = useState<string | null>(null);
 
   useEffect(() => {
     const syncFromHash = () => {
@@ -329,20 +349,65 @@ export default function MealPlannerPage() {
     }
   };
 
+  const loadHistory = useCallback(async () => {
+    if (!userId) return;
+    setIsHistoryLoading(true);
+    setHistoryError(null);
+    try {
+      const response = await fetch("/api/meal-history?limit=8");
+      const data = (await response.json()) as MealHistoryResponse;
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to load meal history.");
+      }
+      setHistoryItems(data.items ?? []);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Failed to load meal history.";
+      setHistoryError(message);
+    } finally {
+      setIsHistoryLoading(false);
+    }
+  }, [userId]);
+
+  useEffect(() => {
+    if (!isAuthLoaded) return;
+    if (!userId) {
+      setHistoryItems([]);
+      setHistoryError(null);
+      return;
+    }
+    void loadHistory();
+  }, [isAuthLoaded, loadHistory, userId]);
+
+  const loadHistoryItem = (item: MealHistoryItem) => {
+    setFormState({
+      age: item.age?.toString() ?? item.inputData.age ?? "",
+      weight: item.weightKg?.toString() ?? item.inputData.weight ?? "",
+      goal: item.goal ?? item.inputData.goal ?? "",
+      preferences: item.preferences ?? item.inputData.preferences ?? "",
+    });
+    setMealPlan(item.generatedPlan);
+    setError(null);
+    setTimeout(() => {
+      document.getElementById("meal-result")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 120);
+  };
+
+  const handleFieldChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormState((prev) => ({ ...prev, [name]: value }));
+  };
+
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setLoading(true);
     setError(null);
     setMealPlan(null);
 
-    const formData = new FormData(e.currentTarget);
-    const data = Object.fromEntries(formData.entries());
-
     try {
       const response = await fetch("/api/meal-plan", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: JSON.stringify(formState),
       });
 
       const result = (await response.json()) as { plan?: string; error?: string };
@@ -352,6 +417,9 @@ export default function MealPlannerPage() {
       }
 
       setMealPlan(result.plan ?? null);
+      if (userId) {
+        void loadHistory();
+      }
       setTimeout(() => {
         document.getElementById("meal-result")?.scrollIntoView({ behavior: "smooth", block: "start" });
       }, 120);
@@ -468,11 +536,13 @@ export default function MealPlannerPage() {
 
           <AnimatedSection delay={240}>
             {activeTool === "planner" ? (
-              <div id="planner" className="mx-auto max-w-3xl scroll-mt-32">
+              <div id="planner" className="mx-auto grid w-full max-w-6xl grid-cols-1 items-start gap-6 scroll-mt-32 xl:grid-cols-2">
                 <div
                   className="rounded-3xl border border-white/10 bg-black/20 p-6 backdrop-blur-2xl sm:p-10"
                   style={{ boxShadow: "0 4px 30px rgba(0,0,0,0.3)" }}
                 >
+                  <p className="mb-2 text-[11px] font-bold tracking-[0.16em] text-primary uppercase">Input Builder</p>
+                  <h3 className="mb-6 text-xl font-black tracking-tight text-white uppercase">Set Your Nutrition Context</h3>
                   <form onSubmit={handleSubmit} className="space-y-6">
                     <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                       <div className="space-y-2">
@@ -481,6 +551,10 @@ export default function MealPlannerPage() {
                           required
                           type="number"
                           name="age"
+                          min={12}
+                          max={90}
+                          value={formState.age}
+                          onChange={handleFieldChange}
                           placeholder="e.g. 25"
                           className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder-white/30 transition-all focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
                         />
@@ -492,6 +566,10 @@ export default function MealPlannerPage() {
                           required
                           type="number"
                           name="weight"
+                          min={35}
+                          max={250}
+                          value={formState.weight}
+                          onChange={handleFieldChange}
                           placeholder="e.g. 75"
                           className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder-white/30 transition-all focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
                         />
@@ -505,6 +583,8 @@ export default function MealPlannerPage() {
                       <select
                         required
                         name="goal"
+                        value={formState.goal}
+                        onChange={handleFieldChange}
                         className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white transition-all focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary [&>option]:bg-[#0a0a0a]"
                       >
                         <option value="">Select a goal...</option>
@@ -522,6 +602,8 @@ export default function MealPlannerPage() {
                       <input
                         type="text"
                         name="preferences"
+                        value={formState.preferences}
+                        onChange={handleFieldChange}
                         placeholder="e.g. Vegetarian, lactose intolerant, no nuts"
                         className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder-white/30 transition-all focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
                       />
@@ -554,19 +636,37 @@ export default function MealPlannerPage() {
                   </form>
                 </div>
 
-                {mealPlan && (
-                  <motion.div
-                    id="meal-result"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="mt-8 rounded-3xl border border-primary/20 bg-black/20 p-6 backdrop-blur-2xl sm:p-10"
-                    style={{ boxShadow: "0 8px 40px rgba(185,255,102,0.06)" }}
-                  >
-                    <h2 className="mb-8 flex items-center gap-3 border-b border-primary/10 pb-4 text-2xl font-black tracking-wide text-primary uppercase">
-                      <Sparkles size={24} />
-                      Your Custom Protocol
-                    </h2>
+                <motion.div
+                  id="meal-result"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="min-w-0 rounded-3xl border border-primary/20 bg-black/20 p-6 backdrop-blur-2xl sm:p-10"
+                  style={{ boxShadow: "0 8px 40px rgba(185,255,102,0.06)" }}
+                >
+                  <h2 className="mb-8 flex items-center gap-3 border-b border-primary/10 pb-4 text-2xl font-black tracking-wide text-primary uppercase">
+                    <Sparkles size={24} />
+                    Your Custom Protocol
+                  </h2>
 
+                  {loading && (
+                    <div className="space-y-3">
+                      <div className="h-3 w-2/3 animate-pulse rounded bg-white/10" />
+                      <div className="h-3 w-11/12 animate-pulse rounded bg-white/10" />
+                      <div className="h-3 w-5/6 animate-pulse rounded bg-white/10" />
+                      <div className="h-3 w-3/4 animate-pulse rounded bg-white/10" />
+                    </div>
+                  )}
+
+                  {!loading && !mealPlan && (
+                    <div className="rounded-2xl border border-white/10 bg-white/3 p-5">
+                      <p className="text-[11px] font-bold tracking-[0.16em] text-primary uppercase">Ready</p>
+                      <p className="mt-2 text-sm leading-6 text-white/70">
+                        Your generated meal protocol will appear here with macros, timed meals, and supplement guidance.
+                      </p>
+                    </div>
+                  )}
+
+                  {mealPlan && (
                     <div className="w-full">
                       <ReactMarkdown
                         components={{
@@ -588,6 +688,19 @@ export default function MealPlannerPage() {
                             />
                           ),
                           li: (props) => <li className="pl-1 text-white/70" {...props} />,
+                          table: (props) => (
+                            <div className="mb-6 overflow-x-auto rounded-xl border border-white/10">
+                              <table className="min-w-full border-collapse text-sm text-white/80" {...props} />
+                            </div>
+                          ),
+                          thead: (props) => <thead className="bg-white/5" {...props} />,
+                          th: (props) => (
+                            <th className="border border-white/10 px-3 py-2 text-left text-xs font-bold uppercase tracking-wider text-primary" {...props} />
+                          ),
+                          td: (props) => <td className="border border-white/10 px-3 py-2 align-top" {...props} />,
+                          code: (props) => (
+                            <code className="wrap-break-word rounded bg-white/10 px-1.5 py-0.5 text-xs text-[#dff8be]" {...props} />
+                          ),
                           strong: (props) => (
                             <strong
                               className="rounded border border-primary/20 bg-primary/10 px-1.5 py-0.5 font-semibold text-white"
@@ -599,7 +712,70 @@ export default function MealPlannerPage() {
                         {mealPlan}
                       </ReactMarkdown>
                     </div>
-                  </motion.div>
+                  )}
+                </motion.div>
+
+                {isAuthLoaded && userId && (
+                  <div className="xl:col-span-2">
+                    <div className="rounded-3xl border border-white/10 bg-black/25 p-5 backdrop-blur-xl md:p-6">
+                      <div className="mb-4 flex items-center justify-between gap-3">
+                        <div>
+                          <p className="text-[11px] font-bold tracking-[0.16em] text-primary uppercase">My History</p>
+                          <p className="mt-1 text-xs text-white/60">Load a previous meal plan into this panel.</p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={loadHistory}
+                          className="rounded-lg border border-white/20 bg-white/5 px-3 py-1.5 text-[11px] font-semibold tracking-[0.12em] text-white/75 uppercase transition-colors hover:border-primary/30 hover:text-primary"
+                        >
+                          Refresh
+                        </button>
+                      </div>
+
+                      {isHistoryLoading && (
+                        <p className="flex items-center gap-2 text-sm text-white/65">
+                          <Loader2 size={14} className="animate-spin text-primary" />
+                          Loading meal history...
+                        </p>
+                      )}
+
+                      {historyError && !isHistoryLoading && (
+                        <p className="text-sm text-red-200">{historyError}</p>
+                      )}
+
+                      {!isHistoryLoading && !historyError && historyItems.length === 0 && (
+                        <p className="text-sm text-white/60">No saved meal plans yet. Generate one to get started.</p>
+                      )}
+
+                      {!isHistoryLoading && historyItems.length > 0 && (
+                        <div className="space-y-3">
+                          {historyItems.map((item) => (
+                            <div
+                              key={item.id}
+                              className="flex flex-col gap-3 rounded-2xl border border-white/10 bg-white/2 p-4 sm:flex-row sm:items-center sm:justify-between"
+                            >
+                              <div>
+                                <p className="text-xs font-bold tracking-[0.14em] text-primary uppercase">
+                                  {item.goal ?? item.inputData.goal ?? "Meal Plan"}
+                                </p>
+                                <p className="mt-1 text-xs text-white/65">
+                                  {new Date(item.createdAt).toLocaleString()} | Age: {item.age ?? item.inputData.age ?? "-"} | Weight:{" "}
+                                  {item.weightKg ?? item.inputData.weight ?? "-"} kg
+                                </p>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => loadHistoryItem(item)}
+                                className="rounded-xl border border-primary/30 bg-primary/10 px-4 py-2 text-xs font-bold uppercase tracking-[0.15em] text-[#ddf6bf] transition-colors hover:border-primary/50 hover:bg-primary/15"
+                              >
+                                Load
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 )}
               </div>
             ) : (
@@ -685,26 +861,52 @@ export default function MealPlannerPage() {
           </div>
 
           <AnimatedSection delay={360}>
-            <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
-              {supplementStack.map((item) => {
+            <div className="space-y-5">
+              {supplementStack.map((item, index) => {
                 const Icon = item.icon;
+                const isReverse = index % 2 === 1;
                 return (
-                  <div key={item.product} className="rounded-2xl border border-white/12 bg-black/35 p-5 backdrop-blur-xl">
-                    <div className="mb-3 flex items-start gap-3">
-                      <div className="rounded-xl border border-primary/25 bg-primary/10 p-2 text-primary">
-                        <Icon size={18} />
-                      </div>
-                      <div>
-                        <p className="text-sm font-black tracking-wide text-white uppercase">{item.product}</p>
-                        <p className="mt-1 text-xs text-[#dff8be]">{item.dose}</p>
+                  <motion.article
+                    key={item.product}
+                    initial={{ opacity: 0, x: isReverse ? 26 : -26 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true, amount: 0.25 }}
+                    transition={{ duration: 0.4, ease: "easeOut" }}
+                    className={`grid grid-cols-1 gap-4 overflow-hidden rounded-2xl border border-white/12 bg-black/35 p-4 backdrop-blur-xl md:grid-cols-2 md:p-5 ${
+                      isReverse ? "md:[&>*:first-child]:order-2" : ""
+                    }`}
+                  >
+                    <div className="relative min-h-52.5 overflow-hidden rounded-xl border border-white/10 bg-linear-to-br from-zinc-800/70 via-zinc-900/60 to-black/60 md:min-h-57.5">
+                      <Image
+                        src={item.image}
+                        alt={item.product}
+                        fill
+                        sizes="(max-width: 767px) 100vw, 50vw"
+                        className="object-contain object-center p-3 transition-transform duration-500 hover:scale-[1.03] md:p-4"
+                      />
+                      <div className="absolute inset-x-0 bottom-0 h-24 bg-linear-to-t from-black/65 via-black/25 to-transparent" />
+                      <div className="absolute bottom-3 left-3 rounded-full border border-primary/35 bg-primary/18 px-3 py-1 text-[10px] font-bold tracking-[0.14em] text-[#e8ffc4] uppercase">
+                        Supplement Focus
                       </div>
                     </div>
-                    <div className="space-y-2 text-xs">
-                      <p className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-white/80">Timing: {item.timing}</p>
-                      <p className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-white/80">Purpose: {item.purpose}</p>
-                      <p className="rounded-lg border border-red-400/20 bg-red-500/5 px-3 py-2 text-white/75">Note: {item.caution}</p>
+
+                    <div>
+                      <div className="mb-3 flex items-start gap-3">
+                        <div className="rounded-xl border border-primary/25 bg-primary/10 p-2 text-primary">
+                          <Icon size={18} />
+                        </div>
+                        <div>
+                          <p className="text-sm font-black tracking-wide text-white uppercase">{item.product}</p>
+                          <p className="mt-1 text-xs text-[#dff8be]">{item.dose}</p>
+                        </div>
+                      </div>
+                      <div className="space-y-2 text-xs">
+                        <p className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-white/80">Timing: {item.timing}</p>
+                        <p className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-white/80">Purpose: {item.purpose}</p>
+                        <p className="rounded-lg border border-red-400/20 bg-red-500/5 px-3 py-2 text-white/75">Note: {item.caution}</p>
+                      </div>
                     </div>
-                  </div>
+                  </motion.article>
                 );
               })}
             </div>
@@ -728,36 +930,6 @@ export default function MealPlannerPage() {
               proteinMetrics={proteinEvidenceBars}
               profiles={evidenceProfiles}
             />
-          </AnimatedSection>
-
-          <AnimatedSection delay={540}>
-            <div className="rounded-2xl border border-white/12 bg-black/35 p-5 backdrop-blur-xl">
-              <div className="mb-4 flex items-center gap-2 text-primary">
-                <Brain size={18} />
-                <p className="text-xs font-bold tracking-[0.18em] uppercase">Recent Studies (2023-2025)</p>
-              </div>
-              <div className="grid grid-cols-1 gap-2 xl:grid-cols-2">
-                {recentStudies.map((study) => (
-                  <a
-                    key={study.title}
-                    href={study.link}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="block rounded-xl border border-white/10 bg-white/3 p-3 transition-colors hover:border-primary/40"
-                  >
-                    <div className="flex items-start justify-between gap-3">
-                      <div>
-                        <p className="text-[10px] font-bold tracking-[0.16em] text-primary uppercase">{study.year}</p>
-                        <p className="mt-1 text-xs font-semibold text-white/85">{study.title}</p>
-                        <p className="mt-0.5 text-[11px] text-white/60">{study.journal}</p>
-                        <p className="mt-1 text-[11px] leading-5 text-white/70">{study.takeaway}</p>
-                      </div>
-                      <ExternalLink size={14} className="mt-0.5 shrink-0 text-white/50" />
-                    </div>
-                  </a>
-                ))}
-              </div>
-            </div>
           </AnimatedSection>
 
           <AnimatedSection delay={420}>
@@ -794,31 +966,43 @@ export default function MealPlannerPage() {
 
           <AnimatedSection delay={560}>
             <div className="mx-auto max-w-3xl text-center">
-              <p className="text-xs font-bold tracking-[0.2em] text-primary uppercase">Visual Categories</p>
+              <p className="text-xs font-bold tracking-[0.2em] text-primary uppercase">Research Digest</p>
               <h3 className="mt-3 text-2xl font-black tracking-tight text-white uppercase sm:text-3xl">
-                Muscle Nutrition Zones
+                Recent Studies (2023-2025)
               </h3>
+              <p className="mt-3 text-xs leading-6 text-white/65">
+                Evidence-backed highlights for protein timing, creatine use, body composition, performance, and sleep impact.
+              </p>
             </div>
           </AnimatedSection>
 
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
-            {nutritionZones.map((zone, index) => (
-              <AnimatedSection key={zone.title} delay={600 + index * 70}>
-                <div className="group overflow-hidden rounded-2xl border border-white/12 bg-black/40">
-                  <div className="relative h-40 w-full">
-                    <Image
-                      src={zone.image}
-                      alt={zone.title}
-                      fill
-                      className="object-cover object-center transition-transform duration-300 group-hover:scale-105"
-                    />
-                    <div className="absolute inset-0 bg-linear-to-t from-black via-black/20 to-transparent" />
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+            {recentStudies.map((study, index) => (
+              <AnimatedSection key={study.title} delay={600 + index * 60}>
+                <motion.a
+                  href={study.link}
+                  target="_blank"
+                  rel="noreferrer"
+                  whileHover={{ y: -2, scale: 1.01 }}
+                  transition={{ duration: 0.2 }}
+                  className="block rounded-2xl border border-white/12 bg-black/35 p-5 backdrop-blur-xl transition-colors hover:border-primary/35"
+                >
+                  <div className="mb-3 flex items-start justify-between gap-3">
+                    <div>
+                      <p className="text-[10px] font-bold tracking-[0.16em] text-primary uppercase">{study.year}</p>
+                      <p className="mt-1 text-sm font-bold leading-6 text-white/90">{study.title}</p>
+                    </div>
+                    <div className="rounded-lg border border-primary/25 bg-primary/10 p-2 text-primary">
+                      <Brain size={14} />
+                    </div>
                   </div>
-                  <div className="p-4">
-                    <p className="text-sm font-black tracking-wide text-white uppercase">{zone.title}</p>
-                    <p className="mt-1 text-xs leading-5 text-white/65">{zone.note}</p>
+                  <p className="text-[11px] font-semibold text-white/60">{study.journal}</p>
+                  <p className="mt-2 text-sm leading-6 text-white/75">{study.takeaway}</p>
+                  <div className="mt-4 inline-flex items-center gap-1 text-[11px] font-bold tracking-[0.12em] text-primary uppercase">
+                    View Source
+                    <ExternalLink size={13} />
                   </div>
-                </div>
+                </motion.a>
               </AnimatedSection>
             ))}
           </div>
