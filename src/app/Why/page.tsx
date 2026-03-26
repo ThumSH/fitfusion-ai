@@ -30,7 +30,7 @@ const team = [
   },
   { 
     name: "Naveed Ahamad",
-    bio: "UG BSc (Hons) in Information Technology Spc Artificail Interligence ",
+    bio: "UG BSc (Hons) in Information Technology Spc Artificial Intelligence ",
     imageUrl: "/naveed.png", 
     imageFocusPosition: "center-top", 
     instagram: "https://www.instagram.com/_navee__18?igsh=MW5iMGFsMWkzNDFsNQ==",
@@ -38,7 +38,7 @@ const team = [
     email: "naveedahamed0524@gmail.com" 
   },
   { 
-    name: "Dimuth Hansaja",
+    name: "Dinuth Hansaja",
     bio: "UG BSc (Hons) in Computer Science",
     imageUrl: "/hansaja.png", 
     imageFocusPosition: "center", 

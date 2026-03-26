@@ -10,21 +10,42 @@ import { motion } from "framer-motion";
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isNavHidden, setIsNavHidden] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { isLoaded, userId } = useAuth();
   const pathname = usePathname();
   const isSignedIn = Boolean(userId);
 
   useEffect(() => {
+    let lastScrollY = window.scrollY;
+
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
+      const currentY = window.scrollY;
+      setIsScrolled(currentY > 20);
+
+      if (isMobileMenuOpen) {
+        setIsNavHidden(false);
+        lastScrollY = currentY;
+        return;
+      }
+
+      if (currentY <= 40) {
+        setIsNavHidden(false);
+      } else if (currentY > lastScrollY + 6) {
+        setIsNavHidden(true);
+      } else if (currentY < lastScrollY - 6) {
+        setIsNavHidden(false);
+      }
+
+      lastScrollY = currentY;
     };
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [isMobileMenuOpen]);
 
   useEffect(() => {
     setIsMobileMenuOpen(false);
+    setIsNavHidden(false);
   }, [pathname]);
 
   const primaryLinks = [
@@ -53,6 +74,8 @@ export default function Navbar() {
   return (
     <nav
       className={`fixed top-0 left-0 z-90 w-full transition-all duration-300 ${
+        isNavHidden ? "-translate-y-full opacity-0 pointer-events-none" : "translate-y-0 opacity-100"
+      } ${
         isScrolled ? "bg-black/70 py-3 backdrop-blur-md" : "bg-transparent py-4"
       }`}
     >
